@@ -1,4 +1,4 @@
 {
-    "baseUrl" : "https://deal-manager.dev.kargo.com/api/v1/",
-    "testFiles": "kargo/**"
+    "testFiles": "kargo/**",
+    "baseUrl" : "https://deal-manager.dev.kargo.com/api/v1/"
     }

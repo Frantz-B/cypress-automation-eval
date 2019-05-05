@@ -8,7 +8,7 @@ const puthttp=require('../../src/https/put')
 const placemnetBody = require('../../configuration/placementPayload.json')
 const sitelistBody = require('../../configuration/sitelistPayload.json')
 const sitelistupdateBody = require('../../configuration/sitelistUpdatePayload.json')
-var campName = 'Automation_test' + moment().format('YY.MM.DD_hh:mm:ss');
+var campName = 'Cypress_Automation_test' + moment().format('YY.MM.DD_hh:mm:ss');
 var rand_number = Math.floor((Math.random() * 90000000000000000) + 100000000000000000);
 const fileName = 'image.png';
 
@@ -23,6 +23,8 @@ const searchEndPoint = getMainConfig.campSearch
 
 sitelistBody.name = campName;
 sitelistupdateBody.name = campName;
+
+var siteListId;
 
 
 
@@ -45,7 +47,7 @@ describe('to create campaign', () => {
             
             cy.wait(3000)
             cy.get('[data-ng-if="header.isAuthorizedModule(menuItem) && !menuItem.disabled"][style=""] > .cpHeader-navLink')
-            .click().wait(3000)     
+            .click().wait(1500)     
             cy.get('.button--primary').click()
             cy.get('.is-active.ng-invalid > :nth-child(2) > :nth-child(1) > .prettyInput').type(`${campName}`) 
             cy.get(':nth-child(2) > .prettyCheckbox').click()
@@ -53,21 +55,21 @@ describe('to create campaign', () => {
             cy.get('div.prettySelect-dropdown--modal:not([class*="is-hidden"]) li.prettySelect-dropdownItem:nth-child(2)').click();
             cy.get('input[placeholder="Salesforce ID"]').type(`${rand_number}`)
             cy.get('input[placeholder="Add advertiser here"]').type('Kargo Test')
-            cy.get('krg-typeahead[data-krg-placeholder="Add advertiser here"] li:nth-child(1)').click().wait(3000)
-            cy.get('input[placeholder="Add brand here"]').type('Kargo').wait(3000)
-            cy.get('krg-typeahead[data-krg-placeholder="Add brand here"] li:nth-child(1)').click().wait(3000)
-            cy.get('div[data-ng-model="ctrl.getSetSaleSourceId"]').click().wait(3000)
+            cy.get('krg-typeahead[data-krg-placeholder="Add advertiser here"] li:nth-child(1)').click().wait(1500)
+            cy.get('input[placeholder="Add brand here"]').type('Kargo').wait(1500)
+            cy.get('krg-typeahead[data-krg-placeholder="Add brand here"] li:nth-child(1)').click().wait(1500)
+            cy.get('div[data-ng-model="ctrl.getSetSaleSourceId"]').click().wait(1500)
             cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown prettySelect-dropdown--bordered"] li:nth-child(1)').click().wait(3000)
-            cy.get('input[placeholder*="Add Campaign Manager"]').type('henry coupet').wait(3000)
-            cy.get('tags-input[name="campaignManagers"] li:nth-child(1)').click().wait(3000)
-            cy.get('input[placeholder*="Sales Leads"]').type('{downarrow}').wait(3000)
-            cy.get('tags-input[placeholder*="Sales Leads"] li:nth-child(1)').click().wait(3000)
-            cy.get('tags-input[placeholder*="Client Service Manager"] input').type('henry coupet').wait(3000)
-            cy.get('tags-input[placeholder*="Client Service Manager"] li:nth-child(1) p3').click().wait(3000)
-            cy.get('input[placeholder="Add Client Development Manager"]').type('Emma Lehmann').wait(3000)
-            cy.get('input[placeholder="Add Client Development Manager"]+div+ul li:nth-child(1)').click().wait(3000)
-            cy.get('input[placeholder="Add Global Client Lead"]').type('{downarrow}').wait(3000)
-            cy.get('div > fieldset > label > input[data-ng-model="campaign.io_number"]').type('123456789').wait(3000)   
+            cy.get('input[placeholder*="Add Campaign Manager"]').type('henry coupet').wait(1500)  
+            cy.get('tags-input[name="campaignManagers"] li:nth-child(1)').click().wait(1500)                
+            cy.get('input[placeholder*="Sales Leads"]').type('Cosima Travis').wait(1500)
+            cy.get('tags-input[placeholder*="Sales Leads"] li:nth-child(1)').click().wait(1500)
+            cy.get('tags-input[placeholder*="Client Service Manager"] input').type('henry coupet').wait(1500)
+            cy.get('tags-input[placeholder*="Client Service Manager"] li:nth-child(1) p3').click().wait(1500)
+            cy.get('input[placeholder="Add Client Development Manager"]').type('Emma Lehmann').wait(1500)
+            cy.get('input[placeholder="Add Client Development Manager"]+div+ul li:nth-child(1)').click().wait(1500)
+            cy.get('input[placeholder="Add Global Client Lead"]').type('{downarrow}').wait(1500)
+            cy.get('div > fieldset > label > input[data-ng-model="campaign.io_number"]').type('123456789').wait(1500)   
             cy.fixture(fileName).then(fileContent => {
              cy.get('article.cpDropAreaBox input.js-fileInput').upload(
              { fileContent, fileName, mimeType: 'image/png' },
@@ -83,18 +85,20 @@ describe('to create campaign', () => {
             cy.get('input[placeholder="+ Anti-Target Location"]').type('New York')
             cy.get('auto-complete[source*="getGeoLocations"] li:nth-child(1)').click()
             cy.get('input[data-ng-model="$ctrl.entity.kpi_information.optimizable_kpi_performance"]').scrollIntoView()
-            cy.get('fieldset.cpCreationPage-formSection.ng-pristine.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required > kc-add-edit-kpi-information > div:nth-child(1) > label:nth-child(1) > div').click().wait(3000)
+            cy.get('fieldset.cpCreationPage-formSection.ng-pristine.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required > kc-add-edit-kpi-information > div:nth-child(1) > label:nth-child(1) > div').click().wait(1500)
             cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click()
-            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(1) > label:nth-child(2) > div').click().wait(3000)
+            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(1) > label:nth-child(2) > div').click().wait(1500)
             cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click()
             cy.get('input[data-ng-model="$ctrl.entity.kpi_information.outcome_kpi_performance"]').scrollIntoView()
-            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(3) > label:nth-child(1) > div').click().wait(3000)
-            cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click().wait(3000)
-            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(3) > label:nth-child(2) > div').click().wait(3000)
-            cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click().wait(3000)
-            cy.get('input[data-ng-model="campaign.dropbox_url"]').type('https://www.google.com').wait(3000)
-            cy.get('button+button[data-ng-click="modal.getDelegate().submit()"]').click().wait(3000) 
-            cy.wait(5000)   
+            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(3) > label:nth-child(1) > div').click().wait(1500)
+            cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click().wait(1500)
+            cy.get('fieldset.cpCreationPage-formSection.ng-valid-pattern.ng-valid-maxlength.ng-invalid.ng-invalid-required.ng-dirty.ng-valid-parse > kc-add-edit-kpi-information > div:nth-child(3) > label:nth-child(2) > div').click().wait(1500)
+            cy.get('div:not([class*="is-hidden"])[class*="prettySelect-dropdown--bordered"] li:nth-child(1)').click().wait(1500)
+            cy.get('input[data-ng-model="campaign.dropbox_url"]').type('https://www.google.com').wait(1500)
+            cy.get('button+button[data-ng-click="modal.getDelegate().submit()"]').click().wait(1500) 
+            cy.server()
+            cy.route('bookmarks/*').as('getCamp')
+
             })
 
             it('get campaign id',()=>{
@@ -125,12 +129,12 @@ describe('to create campaign', () => {
 
             it('TC 005- Add properties to the site list (API):',()=>{
                 puthttp(baseKMUrl + getMainConfig.sitelists + siteListId,sitelistupdateBody,function(response){
-                    assert.equal(respones.status, 201, 'complete successfully')
+                    assert.equal(response.status, 200, 'complete successfully')
                     assert.equal(response.body.message, "Site List updated")
                 })
             })
 
-            it('TC 001- Submitting to media and pushing to ad server (UI):',()=>{
+            it('TC 006- Submitting to media and pushing to ad server (UI):',()=>{
                 cy.visit('https://sso.dev.kargo.com/?redirect=https://marketplace.dev.kargo.com')
                 cy.get('input[name="username"]').type("kargoqa@gmail.com")
                 cy.get('input[name="password"]').type("K@rgo123!")
@@ -139,19 +143,20 @@ describe('to create campaign', () => {
                 cy.wait(2000)
                 cy.get('li[class="cpHeader-navItem"]:nth-child(1)').click().wait(2000)
                 cy.get('h2[data-ng-hide="table.config.hideTitle"]').should('be.visible');
-                cy.get('kc-checkbox[data-ng-model="table.excludeTests"]').click
-                cy.get('input[type="search"]').type(`${campName}`)
-                cy.get('krg-campaigns-table > table > tbody > tr > td:nth-child(1) > div > div > h5 > a').click();
-                cy.get('div h1.headerTitle').should('be.visible');
-                cy.get('div h1.headerTitle').should('equle',`${campName}`)
-                cy.get('button[data-cp-title="\'Submit For Media Plan\'"]').click();
-                cy.get('button[class="button--secondary button--onLightColor detailsRail-item--button u-maxX button"]').should('be.visibl');
-                cy.get('button[class="button--secondary button--onLightColor detailsRail-item--button u-maxX button"]').click();
+                cy.get('kc-checkbox[data-ng-model="table.excludeTests"]').wait(1000).click().wait(3000);
+                cy.get('input[type="search"]').type(`${campName}`).wait(2000)
+                cy.get('krg-campaigns-table table tbody tr td:nth-child(1) div div h5 a:nth-child(1)').wait(2500).click();
+                cy.get('h1.headerTitle').should('be.visible').wait(2000);
+                cy.get('h1.headerTitle').wait(1000).contains(`${campName}`);
+                cy.get('button[data-cp-title="\'Submit For Media Plan\'"]').click().wait(2500);
+                cy.get('button[data-cp-disabled*="ctrl.canPush"]').should('be.visible');
+                cy.get('button[data-cp-disabled*="ctrl.canPush"]').wait(2000).click();
                 cy.get('h2[class="h2--cpModalDialog"]').should('be.visible');
-                cy.get('button[data-ng-if="config.yesButton"]').click()
+                cy.get('button[data-ng-if="config.yesButton"]').click().wait(20000)
                 cy.get('div header[class="cpTile--paneTile cpTile--success"] div div.u-centerY').should('be.visible');
-                cy.get('div header[class="cpTile--paneTile cpTile--success"] div div.u-centerY').should('equal', '1 line item was successfully pushed to the Ad Server')
+                cy.get('div header[class="cpTile--paneTile cpTile--success"] div div.u-centerY').contains('1 line item was successfully pushed to the Ad Server')
 
             });
     
 }) 
+
