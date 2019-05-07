@@ -36,10 +36,10 @@ By creating our own folders/ files we can control and organize all the files or 
 So, we created 2 folders as follows: 
 ##### a. configuration folder (under Cypress): 
 Where we add all of our files and we can organize them in sub folders, we can access these folders using this in the top of the test case file: 
-
+```
 const file = require(../../configuration/filenamePath.json)
 file.name = updateName // updating the name 
-
+```
 ##### b. http folder (under Cypress > src ):
 We create this folder to add all the API request commands as separated files. 
 We can access to file by using: 
