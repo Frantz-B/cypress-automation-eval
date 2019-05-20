@@ -1,0 +1,15 @@
+{
+    "name": "Test Bidder",
+    "status": 1,
+    "user_sync_url_secure": "https://x.bidswitch.net/sync?ssp=kargo&user_id=${USER_ID}",
+    "send_not_synced_users": 0,
+    "direct_like_cookie_sync": 0,
+    "iframe_wrapper": 0,
+    "user_sync_url": "http://x.bidswitch.net/sync?ssp=kargo&user_id=${USER_ID}",
+    "send_video_traffic": 0,
+    "send_native_traffic": 0,
+    "traffic_type": "pmp",
+    "gzip_compression": 0,
+    "exchange_name": null,
+    "sync_weight": 1
+  }

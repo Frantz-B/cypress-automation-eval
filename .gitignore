@@ -1,0 +1,11 @@
+# cypress
+
+cypress/screenshot
+
+s
+cypress/videos
+
+
+
+node_modules
+types
