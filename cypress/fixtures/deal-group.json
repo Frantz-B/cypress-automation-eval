@@ -1,0 +1,62 @@
+{
+  "name": "Test Deal Group",
+  "team": {
+    "agency_sales_lead": [
+      {
+        "name": "Deb Gruner",
+        "id": 1080,
+        "selected": true,
+        "email": "deb@kargo.com",
+        "sales_team": "EAST"
+      }
+    ],
+    "client_service_managers": [
+      {
+        "name": "Amy Berkin",
+        "id": 894,
+        "selected": true,
+        "email": "amy@kargo.com",
+        "sales_team": "MIDWEST"
+      }
+    ],
+    "campaign_managers": [
+      {
+        "name": "Adrienne Ross",
+        "id": 886,
+        "selected": true,
+        "email": "adrienne@kargo.com"
+      }
+    ],
+    "client_development_manager": {},
+    "global_client_lead": {},
+    "client_partnership_managers": []
+  },
+  "target_spend": 23464,
+  "salesforce_id": "oAU3KSD34",
+  "closed_loop_report": null,
+  "kpi": {
+    "optimizable_kpi": "CTR",
+    "optimizable_kpi_measurement_partner": "Celtra",
+    "optimizable_kpi_goal": null,
+    "optimizable_kpi_performance": null,
+    "outcome_kpi": "Landing Page Conversion Rate",
+    "outcome_kpi_measurement_partner": "Floodlight",
+    "outcome_kpi_goal": null,
+    "outcome_kpi_performance": null
+  },
+  "targeting": {
+    "geo_include": [
+      {
+        "dfp_id": "2840",
+        "name": "United States",
+        "country_code": "US",
+        "type": "Country",
+        "parent_summary": "United States",
+        "parent_ids": null,
+        "computed_summary": "United States"
+      }
+    ]
+  },
+  "is_test": true,
+  "is_archived": false
+}
