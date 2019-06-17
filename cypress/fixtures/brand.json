@@ -1,8 +1,0 @@
-{
-  "name": "test-brand-test-1",
-  "is_open_auction_allowed": true,
-  "is_pmp_allowed": true,
-  "advertiser_domains": [
-    "http://cnns.com"
-  ]
-}

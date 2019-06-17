@@ -1,0 +1,6 @@
+{
+    "advertiser_domains": ["https://kargo.com"],
+    "is_open_auction_allowed": true,
+    "is_pmp_allowed": true,
+    "name": "AnyName..This will be overwritten"                           
+}

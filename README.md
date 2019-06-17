@@ -1,16 +1,19 @@
 # deal-manager-automation
 Automated test suite for Deal Manager
 
-This testing framework is a WIP, built using [Cypress](https://www.cypress.io).
 
 ## Getting Started
-- `yarn install`
+- `npm install`
 
 ## Running Tests
-To run the entire test suite, simply run `yarn test`. You can also run individual tests via CLI or via a UI runner.
-Please See the Cypress documentation for more information about how to run individual tests.
+To run the entire test suite, simply run `npm run test`. You can also run individual tests via CLI or via a UI runner.
+i.e. to run a specific test case, simply run `npm test testSeat` 
 
-You can run `yarn ui` to see the UI Runner, which is pretty self explanatory.
+Note: testSeat is a key where "testSeat": "cypress run --spec 'cypress/integration/ui/seats.js’” ,
+you can add, edit and delete these keys from package.json page
+Please See the Cypress documentation for more information.
+
+You can run `npm run ui` to see the UI Runner, which is pretty self explanatory.
 
 ## Writing Tests
 
@@ -22,3 +25,8 @@ This repository is hooked up to run automatically in Travis when there are chang
 
 The default base URL is:
 `https://deal-manager.dev.kargo.com`
+
+
+## JIRA
+
+In future we will use JIRA Issue tracker it would like to integrate GitHub with JIRA, In order to track commits and associate them with open tickets and then hooked up the GitHub side to provide notification when new commits or changes are made to the code base.
