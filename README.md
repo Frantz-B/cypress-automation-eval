@@ -29,4 +29,4 @@ The default base URL is:
 
 ## JIRA
 
-In future we will use JIRA Issue tracker it would like to integrate GitHub with JIRA, In order to track commits and associate them with open tickets and then hooked up the GitHub side to provide notification when new commits or changes are made to the code base. 
+In future we will use JIRA Issue tracker it would like to integrate GitHub with JIRA, In order to track commits and associate them with open tickets and then hooked up the GitHub side to provide notification when new commits or changes are made to the code base.
