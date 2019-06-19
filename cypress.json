@@ -1,4 +1,6 @@
 {
-    "testFiles": "kargo/**",
-    "baseUrl" : "https://deal-manager.dev.kargo.com/api/v1/"
+    "baseUrl": "https://deal-manager.dev.kargo.com",
+    "env": {
+        "authToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJxYS1hdXRvbWF0aW9uLmthcmdvLmNvbSIsImlzcyI6InFhLWF1dG9tYXRpb24ua2FyZ28uY29tIiwiZXhwIjo1MDEwMDA0ODAwLCJ0eXBlIjoiYWNjZXNzX3Rva2VuIiwiYXBwTmFtZSI6InFhLWF1dG9tYXRpb24iLCJjaWQiOiIwZDlhNTBjODgwMGQ4MzQ4MGEyYWVmY2UyNDZlNTEzZDlhZWQ3MmFlZTQ2ZGVjIiwiYXVkIjoia2FyZ28iLCJqdGkiOiJlMjI4MmQwOC1iYjcwLTRlZmQtYWY5NC1hY2E3MGQyMDQ2MjEiLCJpc3N1ZWQiOjE1NTQwNjgwODYsImlhdCI6MTU1NDA2ODA4NiwibmJ0IjoxNTU0MDY4MDg2fQ.sjEN6Nmyt6KYO-p2jgJhaEScS4hVB9U4rac4tvC68sClUaT52PZcJgONgyQBzLWR2Lvxtkv5CfbijIuXyO1m86l1kDWlScKilq68xgqjcKqVmaoYrRIEQjavzF90d62RWNo9QJRc7kDx3FBhNc07SFUsbzVUxaW47OJYt96H4Gmh-8ito8MWhovbXW7yfND0_tOA8P0tLvCaoCJEzXc7aEtLNZVvhFP0ioPhtEhdH8tvP4Z5PREBV2u0YSiV8HwpvSXWyFbJEqs3eVYXswwuhk8dM3Hbdhlgb0zzg-I-5q52bAfgAdqaiChhjq9WvN7tKqddH8_2hLssOfvFyO2snQ"
     }
+}

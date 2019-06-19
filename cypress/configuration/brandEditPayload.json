@@ -1,6 +1,0 @@
-{
-    "advertiser_domains": ["https://google.com"],
-    "is_open_auction_allowed": false,
-    "is_pmp_allowed": true,
-    "name": "AnyName..This will be overwritten"                           
-}
