@@ -1,0 +1,13 @@
+{
+    "name": "Test Bidder",
+    "user_sync_url_secure": "https://kargo.com",
+    "send_not_synced_users": 1,
+    "direct_like_cookie_sync": 1,
+    "iframe_wrapper": 1,
+    "user_sync_url": "http://kargo.com",
+    "send_video_traffic": 1,
+    "send_native_traffic": 1,
+    "traffic_type": "all",
+    "gzip_compression": 1,
+    "sync_weight": 0.5
+  }
