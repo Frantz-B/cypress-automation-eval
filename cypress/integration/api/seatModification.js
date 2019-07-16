@@ -71,6 +71,5 @@ context('Editing Seats - API', () => {
         });
       });
   });
-
 });
 });

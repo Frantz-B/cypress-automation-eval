@@ -50,7 +50,6 @@ context('Editing Bidders - API', () => {
             expect(resp.body.name).to.eq(bidderUpdatedName);
           });
         });
-    });
-    
+    });   
   });
 });

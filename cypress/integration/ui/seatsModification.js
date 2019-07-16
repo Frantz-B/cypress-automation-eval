@@ -45,7 +45,6 @@ context(' Editing Seat UI', () => {
       cy.get('seats-table div.table p').should('contain', seatName); // Newly created seat is found
     });
 
-
     it('Updating the seat', () => {    
       cy.get('input[type="search"]').focus().clear().wait(1500);
       cy.get('div.table-row.datatable-row.u-grid-gap-24 div div i')

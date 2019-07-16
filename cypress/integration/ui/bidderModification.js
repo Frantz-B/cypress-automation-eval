@@ -126,6 +126,6 @@ context('Editing Bidder UI', () => {
     .should('contain', 'http://kargo.com');
     cy.get('section.u-grid.layout--details.u-grid-gap-24 aside div div:nth-child(6) p3')
     .should('contain', 'https://kargo.com');      
-});
-});
+    });
+   });
 });
