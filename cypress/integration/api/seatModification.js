@@ -25,13 +25,11 @@ context('Editing Seats - API', () => {
         bidderPayload = extend(bidderPayload, bidder);
         bidderPayload.name = bidderName;
       });
-
       let reqBody = {};
       cy.fixture('seat.json').then((seat) => {
          reqBody = extend(reqBody, seat);
         reqBody.name = seatName;
       });
-
       const bidderReqOpts = getRequest({
         method: 'POST',
         body: bidderPayload,
@@ -49,23 +47,11 @@ context('Editing Seats - API', () => {
         method: 'POST',
         body: reqBody,
       });
-
       cy.request(seatReqOpts).then((resp) => {
         seatId = resp.body.id;
         expect(resp.status).to.eq(200);
         expect(resp.body.id).to.be.gt(0);
       });
-    });
-
-    it('Retrieve the seat', () => {
-      const requestOptions = getRequest();
-      requestOptions.url += `/${seatId}`;
-
-      cy.request(requestOptions).then((resp) =>
-        {
-          expect(resp.status).to.eq(200);
-          expect(resp.body.id).to.eq(seatId);
-        });
     });
 
     it('Update the seat', () => {
@@ -77,8 +63,7 @@ context('Editing Seats - API', () => {
           method: 'PATCH',
           body: reqBody,
         });
-        requestOptions.url += `/${seatId}`;
-                      
+        requestOptions.url += `/${seatId}`;                      
         cy.request(requestOptions).then((resp) => {
             expect(resp.status).to.eq(200);
             expect(resp.body.id).to.be.gt(0);
@@ -87,14 +72,5 @@ context('Editing Seats - API', () => {
       });
   });
 
-  it('Retrieve the updated seat', () => {
-    const requestOptions = getRequest();
-    requestOptions.url += `/${seatId}`;
-    cy.request(requestOptions).then((resp) => {
-        expect(resp.status).to.eq(200);
-        expect(resp.body.id).to.eq(seatId);
-        expect(resp.body.name).to.eq(seatUpatedName);
-      });
-  });
 });
 });

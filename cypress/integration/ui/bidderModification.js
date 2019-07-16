@@ -27,7 +27,7 @@ context('Editing Bidder UI', () => {
       cy.get('[data-qa="modal--confirm"]').click({force: true}).wait(1000);
     });
 
-    it('Validating new Bidder was created in UI and open it', () => {
+    it('Validating new Bidder was created in UI', () => {
       //After Bidder is successfully created, UI should navigate to bidder page
       // Search functionality is not worknig for bidders page at the moment.
       //  So, for now comments will be added to the "Search" functionality lines to prevent them from execution
@@ -36,7 +36,7 @@ context('Editing Bidder UI', () => {
       //cy.get('[data-qa="bidder--data-row--name"]').should('contain', bidderName);
       cy.get('[data-qa="bidder--data-row--name"]').first()
       .should('contain', bidderName) // // Confirming the new createed bidder is at the top of the table
-      .click({force: true});  
+     // .click({force: true});  
     });
 
     it('Editing the Bidder values from "bidders" table', () => {      

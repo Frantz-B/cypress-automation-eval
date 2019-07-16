@@ -34,15 +34,6 @@ context('Editing Bidders - API', () => {
       });
     });
 
-    it('Retrieve the bidder', () => {
-      const requestOptions = getRequest();
-      requestOptions.url += `/${bidderId}`;
-      cy.request(requestOptions).then((resp) => {
-          expect(resp.status).to.eq(200);
-          expect(resp.body.id).to.eq(bidderId);
-        });
-    });
-
     it('Update the bidder', () => {
       cy.fixture('bidderModification.json').then((bidderModification) => { 
         const reqBody = clone(bidderModification);
@@ -58,15 +49,6 @@ context('Editing Bidders - API', () => {
             expect(resp.body.id).to.be.gt(0);
             expect(resp.body.name).to.eq(bidderUpdatedName);
           });
-        });
-    });
-
-    it('Retrieve the updated bidder', () => {
-      const requestOptions = getRequest();
-      requestOptions.url += `/${bidderId}`;
-      cy.request(requestOptions).then((resp) => {
-          expect(resp.status).to.eq(200);
-          expect(resp.body.id).to.eq(bidderId);
         });
     });
     
