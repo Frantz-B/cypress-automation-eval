@@ -1,11 +1,9 @@
 {
   "name": "Test Deal",
   "start_date": "2020-11-06",
-  "end_date": "2021-12-28",
+  "end_date": "2030-12-28",
   "type": "PRIVATE_AUCTION",
-  "targeting_id": null,
-  "km_atd_id": 3,
-  "km_agency_id": 12,
+  "deal_group_id": 50098,
   "priority": "STANDARD",
   "price": 90,
   "has_kargo_creative": 1,
@@ -16,6 +14,7 @@
   "buffer_percentage": 0,
   "buffered_goal": 0,
   "prioritize_inventory_targeting": 0,
+  "km_format_id": 1,
   "km_execution_id": 2,
   "status_viewability": 0,
   "sample_rate_viewability": null,
@@ -23,6 +22,14 @@
   "km_meas_vendor_id": null,
   "pre_bid": 0,
   "post_bid": 0,
+ "advertisers":[],
+   "brands":[],
+  "dealBuyer": {
+    "bidder_id": 20126,
+    "seat_id": 50063,
+    "km_atd_id": 3,
+    "km_agency_id": 238
+  },
   "targeting": {
     "geo_include": [
       {
@@ -35,5 +42,6 @@
         "computed_summary": "United States"
       }
     ]
-  }
+  },
+  "created_by": null
 }
