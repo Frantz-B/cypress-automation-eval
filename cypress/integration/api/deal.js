@@ -1,4 +1,9 @@
 const extend = require('lodash/extend');
+var startDate = Cypress.moment().format('YYYY-MM-DD');
+var endDate = Cypress.moment().add(1, 'months').format('YYYY-MM-DD');
+const dealGroupName = Cypress.moment().format('YY.MM.DD_hh:mm:ss') + '-API_automation-Deal Group_created';
+const dealName = Cypress.moment().format('YY.MM.DD_hh:mm:ss') + '-API_automation-Deal_created';
+const auctionIdentifier= Cypress.moment().format('YYMMDDhhmmss');
 
 const getRequest = (options = {}) => {
   const defaultOptions = {
@@ -41,18 +46,22 @@ context('Deals', () => {
       cy.fixture('seat.json').then((seat) => {
         seatPayload = extend(seatPayload, seat);
         seatPayload.name = `Test Seat ${random}`;
+        seatPayload.auction_identifier= auctionIdentifier;
       });
 
       let dealGroupPayload = {};
       cy.fixture('deal-group.json').then((dealGroup) => {
         dealGroupPayload = extend(dealGroupPayload, dealGroup);
-        dealGroupPayload.name = `Test Deal Group ${random}`;
+        dealGroupPayload.name = dealGroupName;
+        dealGroupPayload.salesforce_id=`12345${random}`;
       });
 
       let dealPayload = {};
       cy.fixture('deal.json').then((deal) => {
         dealPayload = extend(dealPayload, deal);
-        dealPayload.name = `Test Deal ${random}`;
+        dealPayload.name = dealName;
+        dealPayload.start_date= startDate;
+        dealPayload.end_date=endDate;
       });
 
       const bidderReqOpts = getRequest({
@@ -63,7 +72,7 @@ context('Deals', () => {
       cy.request(bidderReqOpts).then((resp) => {
         seatPayload.bidder_id = resp.body.id;
         dealPayload.bidder_id = resp.body.id;
-
+        
         expect(resp.status).to.eq(200);
         expect(resp.body.id).to.be.gt(0);
       });
@@ -75,7 +84,7 @@ context('Deals', () => {
       });
       cy.request(seatReqOpts).then((resp) => {
         dealPayload.seat_id = resp.body.id;
-
+        cy.log("this is seat id"+ resp.body.id);
         expect(resp.status).to.eq(200);
         expect(resp.body.id).to.be.gt(0);
       });

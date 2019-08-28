@@ -1,36 +1,37 @@
 {
   "name": "Test Deal Group",
-  "team": {
-    "agency_sales_lead": [
-      {
-        "name": "Deb Gruner",
-        "id": 1080,
-        "selected": true,
-        "email": "deb@kargo.com",
-        "sales_team": "EAST"
-      }
+  "team":{  
+    "agency_sales_lead":[  
+       {  
+          "id":2905699,
+          "ku_user_id":944,
+          "name":"Andrew Webster",
+          "profile_image_url":null,
+          "username":"awebster@kargo.com"
+       }
     ],
-    "client_service_managers": [
-      {
-        "name": "Amy Berkin",
-        "id": 894,
-        "selected": true,
-        "email": "amy@kargo.com",
-        "sales_team": "MIDWEST"
-      }
+    "client_service_managers":[  
+       {  
+          "id":2871046,
+          "ku_user_id":760,
+          "name":"Frantz Bazile",
+          "profile_image_url":null,
+          "username":"frantz@kargo.com"
+       }
     ],
-    "campaign_managers": [
-      {
-        "name": "Adrienne Ross",
-        "id": 886,
-        "selected": true,
-        "email": "adrienne@kargo.com"
-      }
+    "campaign_managers":[  
+       {  
+          "id":2815988,
+          "ku_user_id":498,
+          "name":"Adrienne Ross",
+          "profile_image_url":null,
+          "username":"adrienne@kargo.com"
+       }
     ],
-    "client_development_manager": {},
-    "global_client_lead": {},
-    "client_partnership_managers": []
-  },
+    "client_development_manager":{},
+    "global_client_lead":{},
+    "client_partnership_managers":[]
+ },
   "target_spend": 23464,
   "salesforce_id": "oAU3KSD34",
   "closed_loop_report": null,
