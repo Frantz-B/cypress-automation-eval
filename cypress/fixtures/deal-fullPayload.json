@@ -1,0 +1,219 @@
+{
+  "name": "Test Deal",
+  "start_date": "2020-11-06",
+  "end_date": "2030-12-28",
+  "type": "PRIVATE_AUCTION",
+  "deal_group_id": 1,
+  "priority": "STANDARD",
+  "price": 90,
+  "has_kargo_creative": 1,
+  "ignore_publisher_floors": 0,
+  "status": "DRAFT",
+  "target_spend": 900,
+  "impression_goal": 0,
+  "buffer_percentage": 0,
+  "buffered_goal": 0,
+  "km_format_id": 11,
+  "km_execution_id": 51,
+  "status_viewability": 0,
+  "sample_rate_viewability": null,
+  "threshold_viewability": null,
+  "km_meas_vendor_id": null,
+  "pre_bid": 0,
+  "post_bid": 0,
+  "advertisers": [
+    1332,
+    1614
+  ],
+  "brands": [
+    3129,
+    3131
+  ],
+
+  "targeting": {
+    "custom_targeting": {
+       "logicalOperator": "AND",
+       "children": [
+          {
+             "children": [
+                {
+                   "operator": "IS",
+                   "keyName": "GS_CHANNELS_ALL",
+                   "valueNames": [
+                      "gs_auto"
+                   ]
+                },
+                {
+                   "operator": "IS_NOT",
+                   "keyName": "GS_CHANNELS_ALL",
+                   "valueNames": [
+                      "gs_auto_commercial"
+                   ]
+                }
+             ],
+             "logicalOperator": "AND"
+          },
+          {
+             "children": [
+                {
+                   "children": [
+                      {
+                         "operator": "IS",
+                         "keyName": "mas",
+                         "valueNames": [
+                            "wwE"
+                         ]
+                      },
+                      {
+                         "operator": "IS_NOT",
+                         "keyName": "mas",
+                         "valueNames": [
+                            "jRw"
+                         ]
+                      }
+                   ],
+                   "logicalOperator": "AND"
+                },
+                {
+                   "children": [
+                      {
+                         "operator": "IS",
+                         "keyName": "ksg",
+                         "valueNames": [
+                            "test"
+                         ]
+                      },
+                      {
+                         "operator": "IS_NOT",
+                         "keyName": "ksg",
+                         "valueNames": [
+                            "teest45"
+                         ]
+                      }
+                   ],
+                   "logicalOperator": "AND"
+                }
+             ],
+             "logicalOperator": "OR"
+          }
+       ]
+    },
+    "browser_targeting": {
+       "included": [
+          {
+             "name": "Chrome",
+             "value": "chrome"
+          }
+       ],
+       "excluded": []
+    },
+    "frequency_cap": {
+       "day": 77,
+       "week": 456,
+       "hour": 96
+    },
+    "geo_targeting": {
+       "included": [
+          {
+             "country": "united states",
+             "countryCode": "usa",
+             "id": 840,
+             "name": "United States",
+             "type": "COUNTRY"
+          },
+          {
+             "country": "canada",
+             "countryCode": "can",
+             "id": 124,
+             "name": "Canada",
+             "type": "COUNTRY"
+          }
+       ],
+       "excluded": [
+          {
+             "country": "united states",
+             "countryCode": "usa",
+             "id": 501,
+             "name": "New York",
+             "type": "DMA"
+          },
+          {
+             "country": "united kingdom",
+             "countryCode": "gbr",
+             "id": 826,
+             "name": "United Kingdom",
+             "type": "COUNTRY"
+          }
+       ]
+    },
+    "isp_targeting": {
+       "excluded": [],
+       "included": [
+          {
+             "id": 3,
+             "label": "charter communications",
+             "selected": true,
+             "display": "charter communications",
+             "name": "charter communications"
+          }
+       ]
+    },
+    "mobile_carrier_targeting": {
+       "excluded": [],
+       "included": [
+          {
+             "label": "Verizon United States",
+             "id": 70092,
+             "selected": true,
+             "display": "Verizon United States",
+             "name": "Verizon United States"
+          }
+       ]
+    },
+    "social_targeting": {
+       "included": [
+          {
+             "name": "Facebook",
+             "value": "facebook"
+          }
+       ],
+       "excluded": []
+    },
+    "device_targeting": {
+       "included": [
+          {
+             "name": "Mobile",
+             "value": "phone"
+          }
+       ],
+       "excluded": []
+    },
+    "os_targeting": {
+       "included": [],
+       "excluded": [
+          {
+             "name": "Android",
+             "value": "android"
+          }
+       ]
+    },
+    "sample_rate_viewability": 0.42,
+    "status_viewability": true,
+    "threshold_viewability": 1,
+    "zip_code_targeting": {
+      "excluded": [],
+      "included": ["840:45612"]
+    }
+ },
+ "site_list_id": 374,
+ "site_list_type": "INCLUSIVE",
+ "prioritize_inventory_targeting": true,
+ "properties": [92],
+ "dealBuyer": 
+ {
+   "seat_id": null,
+   "bidder_id": 8000,
+   "km_agency_id": null,
+   "km_atd_id": null
+}
+}
