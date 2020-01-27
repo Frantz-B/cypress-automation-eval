@@ -1,0 +1,25 @@
+{  
+    "publisher_id":123,
+    "categories":[  
+       {  
+          "id":3,
+          "weight":10
+       }
+    ],
+    "name":"{{PropertyName}}",
+    "approved_for_direct":true,
+    "approved_for_pmp":true,
+    "ad_tag_release_group_id":1,
+    "countries":[  
+       1
+    ],
+    "languages":[  
+       3
+    ],
+    "target_demographic_ids":[  
+ 
+    ],
+    "logo_id":34913,
+    "background_image_id":null
+ }
+ 
