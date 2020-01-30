@@ -1,0 +1,16 @@
+{
+   "type_id": 4,
+   "display_name": "{{New_ADTagAdSlot_Created}}",
+   "platform": 1,
+   "property_id": "{{New_Property_Created}}",
+   "integration_type": "ad_tag",
+   "ad_unit_formats": [
+      11
+   ],
+   "is_kraken": false,
+   "iframe_helper_url": null,
+   "publisher_open_floor": 10,
+   "publisher_open_floor_video": null,
+   "publisher_open_floor_native": null,
+   "approved_for_pmp_banner": true
+}
