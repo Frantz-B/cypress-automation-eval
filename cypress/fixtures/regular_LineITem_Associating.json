@@ -1,0 +1,21 @@
+{
+    "line_items": [
+    {
+       "id": "",
+       "ad_unit_execution_format_platform_id": 457,
+       "type": "REGULAR",
+       "grace_period": 2,
+       "dfp_priority": 8,
+       "dfp_delivery_rate_type": "FRONTLOADED",
+       "is_pushed": true,
+       "buffered_goal": 1053,
+       "buffer_percentage": 0.05,
+       "is_dormant": 0,
+       "status_viewability": false,
+       "isAssociated": true,
+
+       "creatives": []
+    }
+    ],
+    "associateLineItems": true
+}
