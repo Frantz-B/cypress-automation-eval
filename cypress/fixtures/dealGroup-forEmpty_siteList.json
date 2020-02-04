@@ -1,0 +1,75 @@
+{
+   "name": "dhdh",
+   "id": "{{5834}}",
+   "site_list_id": 5842,
+   "site_list_type": "INCLUSIVE",
+   "targeting": {
+      "custom_targeting": {
+         "logicalOperator": "AND",
+         "children": [
+            {
+               "children": [],
+               "logicalOperator": "OR"
+            }
+         ]
+      },
+      "browser_targeting": {
+         "included": [],
+         "excluded": []
+      },
+      "frequency_cap": {
+         "day": null,
+         "week": null,
+         "hour": null
+      },
+      "geo_targeting": {
+         "included": [
+            {
+               "country": "United States",
+               "countryCode": "usa",
+               "id": 840,
+               "name": "United States",
+               "type": "COUNTRY"
+            }
+         ],
+         "excluded": []
+      },
+      "isp_targeting": {
+         "excluded": [],
+         "included": []
+      },
+      "mobile_carrier_targeting": {
+         "excluded": [],
+         "included": []
+      },
+      "social_targeting": {
+         "included": [],
+         "excluded": []
+      },
+      "device_targeting": {
+         "included": [
+            {
+               "name": "Mobile",
+               "value": "phone"
+            }
+         ],
+         "excluded": []
+      },
+      "os_targeting": {
+         "included": [],
+         "excluded": []
+      },
+      "sample_rate_viewability": 0,
+      "status_viewability": false,
+      "threshold_viewability": 0,
+      "zip_code_targeting": {
+         "excluded": [],
+         "included": []
+      }
+   },
+   "prioritize_inventory_targeting": false,
+   "properties": [
+      1,
+      2
+   ]
+}
