@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 const { clone, extend } = require('lodash');
 const nameHelper = require('../../helpers/name-helper');
 
@@ -16,7 +15,6 @@ const getRequest = (options = {}) => {
   };
   return extend(defaultOptions, options);
 };
-
 
 context('Site Lists', () => {
   describe('Site Lists API', () => {
@@ -41,28 +39,11 @@ context('Site Lists', () => {
         cy.request(requestOptions)
           .then((resp) => {
             assert.equal(resp.status, 400, 'status value ');
-            // assert.isAbove(resp.body.id, 0, 'site list id above 0 ');
+            assert.equal(resp.body.errors[0].messages[0], '"name" is not allowed to be empty', 'status value ');
           });
       });
     });
-    it('Create a Site List without properties', () => {
-      cy.fixture('site-list.json').then((sitelist) => {
-        const reqBody = clone(sitelist);
-        reqBody.name = nameHelper.generateName('API-Site_List-created');
-        reqBody.properties = [];
 
-        const requestOptions = getRequest({
-          method: 'POST',
-          body: reqBody,
-          failOnStatusCode: false,
-        });
-        cy.request(requestOptions)
-          .then((resp) => {
-            assert.equal(resp.status, 400, 'status value ');
-            // assert.isAbove(resp.body.id, 0, 'site list id above 0 ');
-          });
-      });
-    });
     it('Create a correct Site List', () => {
       cy.fixture('site-list.json').then((sitelist) => {
         const reqBody = clone(sitelist);
@@ -134,6 +115,7 @@ context('Site Lists', () => {
         cy.request(requestOptions)
           .then((resp) => {
             assert.equal(resp.status, 400, 'status value ');
+            assert.equal(resp.body.errors[0].messages[0], '"properties" does not contain 1 required value(s)', 'status value ');
           });
       });
     });
@@ -152,6 +134,7 @@ context('Site Lists', () => {
         cy.request(requestOptions)
           .then((resp) => {
             assert.equal(resp.status, 400, 'status value ');
+            assert.equal(resp.body.errors[0].messages[0], '"0" must be a number', 'status value ');
           });
       });
     });
@@ -170,6 +153,7 @@ context('Site Lists', () => {
         cy.request(requestOptions)
           .then((resp) => {
             assert.equal(resp.status, 400, 'status value ');
+            assert.equal(resp.body.errors[0].messages[0], '"properties" must be an array', 'status value ');
           });
       });
     });
