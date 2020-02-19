@@ -86,6 +86,7 @@ context('Verify the ability of updating users', () => {
 
             assert.equal(resp.status, 200, 'response status ');
             assert.isAbove(resp.body.id, 0, ['id is greater than 0 ']);
+            assert.equal(resp.body.company_id, 2, 'company ID');
           });
       });
     });
@@ -99,6 +100,7 @@ context('Verify the ability of updating users', () => {
           assert.equal(resp.body.roles[1].UserRole.role_id, 4, 'role id');
           assert.equal(resp.body.id, userId, 'user id');
           assert.equal(resp.body.roles[1].description, 'Can do everything on seats (within bidders)', 'description ');
+          assert.equal(resp.body.company_id, 2, 'company ID');
         });
     });
     it('retrieve users after adding new user', () => {
