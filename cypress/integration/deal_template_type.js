@@ -205,7 +205,7 @@ context('Deals with template type', () => {
         const requestOptions = getRequest({
           method: 'POST',
           body: reqBody,
-          url: 'https://deal-manager.dev.kargo.com/api/v1/deal/templates',
+          url: 'https://deal-manager.dev.kargo.com/api/v1/deal/template',
         });
         cy.request(requestOptions)
           .then((resp) => {
