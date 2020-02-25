@@ -192,15 +192,14 @@ context('Deals', () => {
       cy.get('audience-targeting form div .layout--targeting-section section:nth-child(2) .layout--targeting-item div .input-wrapper.input-wrapper--typeahead.u-fillRemaining tags-input section div input').click().type('A').then(() => {
         cy.get('ul.dropdown-menu:nth-child(1) li:nth-child(2)').click();
       });
-      // will be enabeled when the bug fixed
 
       // GEO TARGETING
-      // cy.get('geo-targeting section div.u-grid.actions-row div:nth-child(1) div div').click().then(() => {
-      //   cy.get('geo-targeting  div.u-grid.actions-row > div:nth-child(1) > div > ul > li:nth-child(2) > a').click();
-      // });
-      // cy.get('geo-targeting [placeholder="Choose a location"]').focus().type('new york').then(() => {
-      //   cy.get('ul.dropdown-menu:nth-child(1) li:nth-child(1)').click();
-      // });
+      cy.get('geo-targeting section div.u-grid.actions-row div:nth-child(1) div div').click().then(() => {
+        cy.get('geo-targeting  div.u-grid.actions-row > div:nth-child(1) > div > ul > li:nth-child(2) > a').click();
+      });
+      cy.get('geo-targeting [placeholder="Choose a location"]').focus().type('new york').then(() => {
+        cy.get('ul.dropdown-menu:nth-child(1) li:nth-child(1)').click();
+      });
       cy.get('[class="button button--primary button--medium"]').click().wait(1000);
       cy.get('div[class="button-group push-wrapper"] button').click();
       cy.wait(3000);
