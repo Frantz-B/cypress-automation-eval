@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const { clone, extend } = require('lodash');
 const nameHelper = require('../../helpers/name-helper');
 
@@ -40,12 +41,12 @@ context('Deals with template type', () => {
         cy.request(requestOptions)
           .then((resp) => {
             bidderId = resp.body.id;
-
             assert.equal(resp.status, 200, ['response status value ']);
             assert.isAbove(resp.body.id, 0, ['id is greater than 0 ']);
           });
       });
     });
+
     it('pushing the created bidder to ad-server', () => {
       cy.fixture('Bidder-to-adServer.json').then((bidder) => {
         const reqBody = clone(bidder);
@@ -99,6 +100,7 @@ context('Deals with template type', () => {
       cy.get('[data-qa="Priority-dropdown--button"]').click().then(() => {
         cy.get('[data-qa="Priority-dropdown--select--1"]').click();
       });
+
       // Select a format
       cy.get('[data-qa="deal-form--select-format"]').click().type('Bottom Banner').then(() => {
         cy.get('[data-qa="deal-form--select-format"]').parent('.input-wrapper--typeahead').find('.dropdown-menu').children('li')
@@ -132,7 +134,6 @@ context('Deals with template type', () => {
       });
 
       cy.get('[data-qa="deal-create--name"]').clear().type(dealName);
-
       cy.get('[data-qa="deal-add-edit--submit"]').click().wait(500).then(() => {
         cy.get('[data-qa="modal--confirm"]').click();
       });
@@ -140,9 +141,9 @@ context('Deals with template type', () => {
       // Validating Deal info
 
       cy.get('[data-qa="deal-detail--title"]').should('contain', dealName).wait(300);
-      cy.get('main > article > aside > div > section:nth-child(3) > div:nth-child(7) > p4').should('contain', targetSpend);
-      cy.get('article > aside > div > section:nth-child(3) > div:nth-child(6) > p4').should('contain', rate);
-      cy.get('article > aside > div > section:nth-child(3) > div:nth-child(9) > p4').should('contain', 'Bottom Banner');
+      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', targetSpend);
+      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', rate);
+      cy.get('[data-qa="deal-detail--deal_format"]').should('contain', 'Bottom Banner');
 
       cy.location().then((currentLocation) => {
         const urlPathName = currentLocation.pathname;
@@ -184,18 +185,20 @@ context('Deals with template type', () => {
       cy.get('[data-qa="deal-add-edit--submit"]').click();
       cy.get('[data-qa="modal--confirm"]').click();
       cy.get('[data-qa="deal-detail--title"]').should('contain', `${dealName}_edited`).wait(300);
-      cy.get('main > article > aside > div > section:nth-child(3) > div:nth-child(7) > p4').should('contain', targetSpend);
-      cy.get('article > aside > div > section:nth-child(3) > div:nth-child(6) > p4').should('contain', rate);
-      cy.get('article > aside > div > section:nth-child(3) > div:nth-child(9) > p4').should('contain', 'ABA Adhesion Display');
-      cy.get('aside > div > section:nth-child(3) > div:nth-child(11) > p4').should('contain', 'Adhesive Bottom Banner');
+      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', targetSpend);
+      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', rate);
+      cy.get('[data-qa="deal-detail--deal_format"]').should('contain', 'ABA Adhesion Display');
+      cy.get('[data-qa="deal-detail--deal_template"]').should('contain', 'Adhesive Bottom Banner');
+
       // Grabbing Deal ID
-      cy.get('article > aside > div > div.button-group.push-wrapper > button > div > span').click().wait(3000);
+      cy.get('[data-qa="deal-details--push_to_ad_server"]').click().wait(3000);
       cy.get('section.status-box h4 ')
         .invoke('text').then((text) => {
           AsideDealId = text;
           cy.log(AsideDealId);
         });
     });
+
     it('Pushing Creative Optimizer', () => {
       cy.fixture('creativeOptimizer.json').then((optimizer) => {
         const reqBody = clone(optimizer);
