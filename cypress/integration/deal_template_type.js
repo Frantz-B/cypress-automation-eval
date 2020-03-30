@@ -1,5 +1,6 @@
 /* eslint-disable linebreak-style */
 const { clone, extend } = require('lodash');
+const { login } = require('../../helpers/login-helper');
 const nameHelper = require('../../helpers/name-helper');
 
 const getRequest = (options = {}) => {
@@ -14,10 +15,14 @@ const getRequest = (options = {}) => {
 
 context('Deals with template type', () => {
   describe('Deals UI', () => {
-    beforeEach(() => {
-      cy.setCookie('kauth_access', Cypress.env('authToken'));
-      cy.visit('');
+    let userSessionToken;
+    before(() => {
+      userSessionToken = login('kargoqa@gmail.com', 'K@rgo123!');
     });
+    beforeEach(() => {
+      cy.setCookie('kauth_access', userSessionToken);
+    });
+
 
     let dealID;
     let rate;
@@ -96,10 +101,10 @@ context('Deals with template type', () => {
         cy.url().should('include', 'deal-dashboard/deals/create');
       });
 
-      cy.get('[data-qa="deal-create--set-preferred-rate"]').click();
-      cy.get('[data-qa="Priority-dropdown--button"]').click().then(() => {
-        cy.get('[data-qa="Priority-dropdown--select--1"]').click();
-      });
+      // cy.get('[data-qa="deal-create--set-preferred-rate"]').click();
+      // cy.get('[data-qa="Priority-dropdown--button"]').click().then(() => {
+      //   cy.get('[data-qa="Priority-dropdown--select--1"]').click();
+      // });
 
       // Select a format
       cy.get('[data-qa="deal-form--select-format"]').click().type('Bottom Banner').then(() => {
@@ -135,12 +140,15 @@ context('Deals with template type', () => {
 
       cy.get('[data-qa="deal-create--name"]').clear().type(dealName);
       cy.get('[data-qa="deal-add-edit--submit"]').click().wait(500).then(() => {
-        cy.get('[data-qa="modal--confirm"]').click();
+        cy.get('[data-qa="modal--confirm"]', { timeout: 9000 }).click();
       });
 
-      // Validating Deal info
+      // pushing the deal to ad-server
+      cy.get('[data-qa="deal-details--push_to_ad_server"]').click();
 
-      cy.get('[data-qa="deal-detail--title"]').should('contain', dealName).wait(300);
+      // Validating Deal info
+      cy.wait(1000);
+      cy.get('[data-qa="deal-detail--title"]', { timeout: 9000 }).should('contain', dealName).wait(300);
       cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', targetSpend);
       cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', rate);
       cy.get('[data-qa="deal-detail--deal_format"]').should('contain', 'Bottom Banner');
@@ -149,6 +157,22 @@ context('Deals with template type', () => {
         const urlPathName = currentLocation.pathname;
         dealID = urlPathName.split('/').pop(); // Grabbing Deal ID from URL
       });
+    });
+
+    it('checking the deal in ssp side', () => {
+      const requestOptions = getRequest();
+      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${dealID}/ssp`;
+
+      cy.request(requestOptions)
+        .then((resp) => {
+          assert.equal(resp.body.status, 1, 'response status ');
+          assert.equal(resp.body.name, dealName, 'deal Name ');
+          assert.equal(resp.body.external_id, dealID, 'deal ID ');
+          assert.equal(resp.body.type, 'private_auction', 'Deal Type ');
+          assert.equal(resp.body.bid_floor, rate, 'bid floor value ');
+          assert.equal(resp.body.ad_formats[0].name, 'Bottom Banner', 'ad format ');
+          assert.equal(resp.body.ad_formats[0].type, 'banner', 'ad format type ');
+        });
     });
 
     it('Edit Deal', () => {
@@ -162,6 +186,7 @@ context('Deals with template type', () => {
       targetSpend = Math.floor(Math.random() * 200);
 
       // Edit deal name
+      cy.get('[data-qa="deal-create--set-preferred-rate"]').click();
       cy.get('[data-qa="deal-create--name"]').focus().type('_edited');
 
       // Edit rate and target spend
@@ -215,6 +240,22 @@ context('Deals with template type', () => {
             assert.equal(resp.status, 200, ['response status value ']);
           });
       });
+    });
+
+    it('checking the deal in ssp side', () => {
+      const requestOptions = getRequest();
+      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${dealID}/ssp`;
+
+      cy.request(requestOptions)
+        .then((resp) => {
+          assert.equal(resp.body.status, 1, 'response status ');
+          assert.equal(resp.body.name, `${dealName}_edited`, 'deal Name ');
+          assert.equal(resp.body.external_id, dealID, 'deal ID ');
+          assert.equal(resp.body.type, 'preferred_fixed_price', 'Deal Type ');
+          assert.equal(resp.body.first_look_cpm, rate, 'bid floor value ');
+          assert.equal(resp.body.ad_formats[0].name, 'Native Anchor', 'ad format ');
+          assert.equal(resp.body.ad_formats[0].type, 'native', 'ad format type ');
+        });
     });
   });
 });
