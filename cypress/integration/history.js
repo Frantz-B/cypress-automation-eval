@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 const { clone, extend } = require('lodash');
 const { login } = require('../../helpers/login-helper');
 
