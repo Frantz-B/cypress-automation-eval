@@ -1,19 +1,8 @@
-const { extend } = require('lodash');
 const { login } = require('../../helpers/login-helper');
-const nameHelper = require('../../helpers/name-helper');
+const { generateName, generateRandomNum } = require('../../helpers/name-helper');
 
-const getRequest = (options = {}) => {
-  const defaultOptions = {
-    auth: {
-      bearer: Cypress.env('authToken'),
-    },
-    url: '/api/v1/deal',
-  };
-  return extend(defaultOptions, options);
-};
-
-context('Creating Deal then archive it', () => {
-  describe('Deals UI - Archive', () => {
+context('Deals', () => {
+  describe('Deals UI', () => {
     let userSessionToken;
 
     before(() => {
@@ -31,11 +20,20 @@ context('Creating Deal then archive it', () => {
     let masValue;
     let gsValue;
     let rateValue;
-    const dealName = nameHelper.generateName('UI-Deal_created');
-    const rate = Math.floor(Math.random() * 200);
-    const targetSpend = Math.floor(Math.random() * 200);
+    const dealName = generateName('UI-Deal');
+    const rate = generateRandomNum(200);
+    const targetSpend = generateRandomNum(200);
+    const getRequest = (options = {}) => {
+      const defaultOptions = {
+        auth: {
+          bearer: Cypress.env('authToken'),
+        },
+        url: '/api/v1/deal',
+      };
+      return Cypress._.extend(defaultOptions, options);
+    };
 
-    it('Creating a deal', () => {
+    it('Add a deal', () => {
       cy.visit('');
       cy.get('[data-qa="deals-dashboards--select-deal-groups"]').click().then(() => {
         cy.url().should('include', 'deal-dashboard/deal-groups');
@@ -46,7 +44,7 @@ context('Creating Deal then archive it', () => {
       });
 
       // adding wait temporarily until Deal creation page loads faster, like Deal-Group creation pg
-      cy.get('[data-qa="deal-dashboard--add-deal"]', { timeout: 9000 }).click().then(() => {
+      cy.get('[data-qa="deal-dashboard--add-deal"]', { timeout: 6000 }).click().then(() => {
         cy.url().should('include', 'deal-dashboard/deals/create');
       });
       cy.get('[data-qa="deal-create--name"]').focus().clear().type(dealName);
@@ -83,6 +81,12 @@ context('Creating Deal then archive it', () => {
           .children('a')
           .click();
       });
+
+      // Commenting below to verify this will not be need at all
+      // cy.get('[data-qa="deal-create--ignore-pub-floor"]').click().then(() => {
+      //   cy.get('[data-qa="deal-create--ignore-pub-floor"]').should('have.class', 'is-on');
+      //   cy.get('[data-qa="deal-create--ignore-pub-floor"]').click();
+      // });
 
       cy.get('[data-qa="deal-add-edit--submit"]').click();
       cy.get('[data-qa="modal--confirm"]').click();
@@ -173,17 +177,20 @@ context('Creating Deal then archive it', () => {
       cy.get('[placeholder="+ Add ISP Target"]').click().type('digital{enter}');
       cy.get('[placeholder="+ Add Carrier"]').click().type('at&t{enter}');
       cy.get('[placeholder="+ Add Social"]').click().type('pin{enter}');
-      cy.get('[placeholder="+ Add Device"]').click().type('tab{enter}');
+      cy.get('[placeholder="+ Add Device"]').click();
+      cy.contains('Tablet', { timeout: 9000 }).click();
 
       // GEO TARGETING
       cy.get('[data-qa="geo-targeting--dropdown_type"]').click();
       cy.get('[data-qa="geo-targeting--dropdown_type_EXCLUDE"]').click();
       cy.get('[placeholder="Choose a location"]').focus().type('tokyo');
-      cy.get('[class="typeahead-target"]').first().click(); // selecting 1st option from dropdown
+      cy.contains('Region').click(); // selecting Region version option from dropdown
       cy.get('[data-qa="targeting--save_targeting"]').click().wait(2400);
 
       cy.get('[data-qa="deal-details--push_to_ad_server"]').click();
       cy.wait(2000); // Adding this way to make sure data is pushed fully to external systems.
+
+      cy.get('p2:nth-child(2)').should('have', 'Tablet'); // Verifying Deal has tablet in devices section
 
       // Grabbing targeting values from saved state of deal targeting section
       cy.get('contextual-targeting section:nth-child(1) p2')
@@ -211,9 +218,6 @@ context('Creating Deal then archive it', () => {
           assert.equal(resp.body.name, `${dealName}_edited`, 'deal Name ');
           assert.equal(resp.body.external_id, dealID, 'deal ID ');
           assert.equal(resp.body.type, 'preferred_fixed_price', 'Deal Type ');
-          assert.equal(resp.body.first_look_cpm, rate, 'bid floor value ');
-          assert.equal(resp.body.ad_formats[0].name, 'Anchor', 'ad format ');
-          assert.equal(resp.body.ad_formats[0].type, 'banner', 'ad format type ');
         });
     });
 
@@ -265,41 +269,35 @@ context('Creating Deal then archive it', () => {
     });
 
     it('Clicking on "Archive" button in the deal entry page', () => {
-      cy.get('div.button-group.information button').click().wait(1500);
-      cy.get('deal-details >  message-modal button.button.button--primary').click().wait(1800);
-    });
+      cy.get('[data-qa="deal-detail--deal_archive"]', { timeout: 1500 }).click({ force: true });
+      cy.get('[data-qa="modal--confirm"]').last().click();
+      cy.wait(3000);
+      // Verifying element after deal is archived
+      cy.get('[data-qa="targeting--edit_targeting"]').should('be.disabled');
+      cy.get('[data-qa="deal-detail--deal_unarchive"]').should('contain', 'Unarchive');
+      cy.get('[data-qa="deal-create--goto-deal-group"]', { timeout: 1500 }).click().wait(1000); // User return to deal groups entry page
+      cy.get('input[type="search"]', { timeout: 3500 }).clear().type(dealName);
 
-    it('Verifying that deal is archived', () => {
-      cy.get('deal-details targeting > section button-group > button').should('be.disabled').wait(500);
-      cy.get('.icon-archive').should('exist').wait(1000);
-      cy.get('div.button-group.information button').should('contain', 'Unarchive');
-      cy.get('[data-qa="deal-create--goto-deal-group"] .breadcrumb').click().wait(2000); // User return to deal groups entry page
-      cy.wait(1000).get('input[type="search"]').clear().type(dealName)
-        .wait(1500);
-
-      cy.get('.t-regular').should('exist').wait(1000); // No deal is returned
+      cy.get('.t-regular', { timeout: 1500 }).should('exist'); // No deal is returned
       cy.get('deal-group-detail deals div[class="dropdown-wrapper dropdown-wrapper--hover"]:nth-child(4)')
         .click().wait(1000); // Clicking no "archive" filter
-      cy.get('ul li:nth-child(3) a').click().wait(1000); // Clicking on archive option
+      cy.get('ul li:nth-child(3) a', { timeout: 1500 }).click(); // Clicking on archive option
       cy.get('[data-qa="deal-dashboard--select-deal"]').should('exist');
-      cy.get('.t-regular').should('not.exist').wait(1000); // "No results found" text should NOT display
+      cy.get('.t-regular', { timeout: 1500 }).should('not.exist'); // "No results found" text should NOT display
     });
 
     it('Clicking on "Unrchive" button in the deal group entry page', () => {
-      cy.get('[data-qa="deal-dashboard--select-deal"]').click().wait(2000);
-      cy.get('div.button-group.information button').click().wait(2500);
-      cy.get('deal-details >  message-modal button.button.button--primary').click().wait(1800);
-    });
+      cy.wait(1500);
+      cy.get('[data-qa="deal-dashboard--select-deal"]', { timeout: 3500 }).click();
+      cy.get('[data-qa="deal-detail--deal_unarchive"]', { timeout: 2500 }).click();
+      cy.get('[data-qa="modal--confirm"]').last().click();
+      cy.get('[data-qa="targeting--edit_targeting"]').should('be.enabled', { timeout: 1500 });
+      cy.get('.icon-archive', { timeout: 1500 }).should('not.exist');
+      cy.get('[data-qa="deal-detail--deal_archive"]', { timeout: 1500 }).should('contain', 'Archive');
+      cy.get('[data-qa="deal-create--goto-deal-group"]').click(); // User return to deal groups landing page
 
-    it('Verifying that deal group is Unarchived', () => {
-      cy.get('deal-details targeting > section button-group > button').should('be.enabled').wait(500);
-      cy.get('.icon-archive').should('not.exist').wait(1000);
-      cy.get('div.button-group.information button').should('contain', 'Archive');
-      cy.get('[data-qa="deal-create--goto-deal-group"] .breadcrumb').click().wait(200); // User return to deal groups landing page
-
-      cy.wait(1000).get('input[type="search"]').clear().type(dealName)
-        .wait(1500);
-      cy.get('.t-regular').should('not.exist').wait(1000); // deal group is returned
+      cy.get('input[type="search"]', { timeout: 1500 }).clear().type(dealName);
+      cy.get('.t-regular', { timeout: 1500 }).should('not.exist'); // deal group is returned
     });
   });
 });
