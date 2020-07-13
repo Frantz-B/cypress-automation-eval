@@ -99,5 +99,31 @@ context('Deal-group ', () => {
         assert.equal(dmdealGroupPayload.kpi.optimizable_kpi_measurement_partner, dealgroupJson.kpi.optimizable_kpi_measurement_partner, 'optimizable kpi measurement partner ');
       });
     });
+
+    it('Archiving created dealGroup', () => {
+      const dmdealGroupRequestOptions = requestOptions({
+        method: 'DELETE',
+        url: `/api/v1/deal-group/${dealgroupJson.id}`,
+      });
+
+      cy.request(dmdealGroupRequestOptions).then((dmdealGroupResponse) => {
+        assert.equal(dmdealGroupResponse.status, 200, 'Response Status Value ');
+        assert.equal(dmdealGroupResponse.body, 'Model deleted', 'messsage ');
+      });
+    });
+
+    it('Unarchiving dealGroup', () => {
+      const dealgroupReqBody = clone(dealgroupJson);
+      const dmdealGroupRequestOptions = requestOptions({
+        method: 'PUT',
+        body: dealgroupReqBody,
+        url: `/api/v1/deal-group/${dealgroupJson.id}/unarchive`,
+      });
+
+      cy.request(dmdealGroupRequestOptions).then((dmdealGroupResponse) => {
+        cy.task('log', `deal-group is archived? : ${dmdealGroupResponse.body.is_archived}`);
+        assert.equal(dmdealGroupResponse.status, 200, 'Response Status Value :');
+      });
+    });
   });
 });
