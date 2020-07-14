@@ -1,6 +1,5 @@
-/* eslint-disable linebreak-style */
 const { login } = require('../../helpers/login-helper');
-const { generateName, generateRandomNum } = require('../../helpers/name-helper');
+const { generateName, generateRandomNum, generateRandomNumBetween } = require('../../helpers/name-helper');
 
 context('Deals', () => {
   describe('Deals UI', () => {
@@ -15,22 +14,12 @@ context('Deals', () => {
     beforeEach(() => {
       cy.setCookie('kauth_access', userSessionToken);
     });
-    const dealData = {
-      formatType: 'Bottom Banner',
-      executionName: 'AbedEXECUTION  28-6 8.51',
-      rate: generateRandomNum(200),
-      discount: generateRandomNum(10),
-      targetSpend: generateRandomNum(200),
-      bidderName: '1072 Charo',
-      advertiser: '10aug2017adver -dev',
-      priority: 'Highest',
-    };
-    let dealID;
-    let citadelValue;
-    // let masValue; temporarily until MAS is working
-    let gsValue;
-    let rateValue;
-    const dealName = generateName('UI-Deal');
+
+    let externalDealId;
+    let dealType;
+    const deal = {};
+
+
     const getRequest = (options = {}) => {
       const defaultOptions = {
         auth: {
@@ -41,127 +30,184 @@ context('Deals', () => {
       return Cypress._.extend(defaultOptions, options);
     };
 
-    it('Add a deal', () => {
-      const searchTerm = Cypress.moment().format('YY.MM'); // Search for a deal-group made via automation
+    it('Add Preferred-Fixed-Rate Deal', () => {
+      deal.executionName = 'Standard';
+      deal.formatName = 'Bottom Banner';
+      deal.bidderName = 'BidSwitch-dev';
+      deal.rate = generateRandomNum(200);
+      deal.name = generateName('UI-Deal');
+      deal.discount = generateRandomNum(100);
+      deal.targetSpend = generateRandomNum(4000);
+      deal.advertiser = 'Frantz-09.17 max effort -Dev';
+      const recentlyCreatedDealGroup = Cypress.moment().format('YY.MM'); // Search for a deal-group made via automation
+
+      cy.server();
+      cy.route('POST', '/api/v1/deal').as('dealCreation');
+      cy.route(`/api/v1/deal-group?limit=25&page=1&search=${recentlyCreatedDealGroup}&is_archived=false&exclude_tests=true&by_user=false`).as('searchAPI');
 
       cy.visit('');
-      cy.server();
-      cy.route(`/api/v1/deal-group?limit=25&page=1&search=${searchTerm}&is_archived=false&exclude_tests=true&by_user=false`).as('searchAPI');
-
-      cy.get('[placeholder="Search"]', { timeout: 4000 }).type(searchTerm).wait('@searchAPI');
-      cy.get('[data-qa="deal-group-dashboard--select-deal-group"]', { timeout: 1000 }).first().click();
+      cy.get('[placeholder="Search"]', { timeout: 8000 }).type(recentlyCreatedDealGroup).wait('@searchAPI');
+      cy.get('[data-qa="deal-group-dashboard--select-deal-group"]', { timeout: 8000 }).first().click();
       cy.url().should('include', 'deal-dashboard/deal-groups');
-      cy.get('[data-qa="deal-dashboard--add-deal"]', { timeout: 6000 }).click();
+      cy.get('[data-qa="deal-dashboard--add-deal"]', { timeout: 8000 }).click();
       cy.url().should('include', 'deal-dashboard/deals/create');
-      cy.get('[data-qa="deal-create--name"]').focus().clear().type(dealName);
+      cy.get('[data-qa="deal-create--name"]').focus().clear().type(deal.name);
       cy.get('[data-qa="deal-create--set-preferred-rate"]').click();
       cy.get('[data-qa="Priority-dropdown--button"]').click();
-      cy.contains(dealData.priority).click();
+      cy.get('[data-qa="Priority-dropdown--select--1"]').click(); // Selects 'Highest' priority to match deal.priority
+      deal.priority = 'Highest';
 
       // Select a format
-      cy.get('[data-qa="deal-form--select-format"]').click();
-      cy.contains(dealData.formatType).click();
+      cy.get('[data-qa="deal-form--select-format"]').click().type(deal.formatName);
+      cy.get('[data-qa="deal-form--select-format"]').parent('.input-wrapper--typeahead').find('.dropdown-menu').children('li')
+        .first()
+        .children('a')
+        .click();
+
       // Select a execution
-      cy.get('[data-qa="deal-form--select-execution"]').click();
-      cy.contains(dealData.executionName).click();
+      cy.get('[data-qa="deal-form--select-execution"]').click().type(deal.executionName);
+      cy.get('[data-qa="deal-form--select-execution"]').parent('.input-wrapper--typeahead').find('.dropdown-menu').children('li')
+        .first()
+        .children('a')
+        .click();
 
       // Select rate and target spend
-      cy.get('[data-qa="deal-create--rate"]').focus().type(dealData.rate);
-      cy.get('[data-qa="deal-create--rate-discount"]').focus().type(dealData.discount);
-      cy.get('[data-qa="deal-create--target-spend"]').focus().type(dealData.targetSpend);
+      cy.get('[data-qa="deal-create--rate"]').focus().type(deal.rate);
+      cy.get('[data-qa="deal-create--target-spend"]').focus().type(deal.targetSpend);
+      cy.get('[data-qa="deal-create--rate-discount"]').focus().clear().type(deal.discount); // clear() needed since field initially has a '0'
 
       // Buyers Section - select bidder
-      cy.get('[data-qa="deal-form--select-bidder"]').click().clear();
-      cy.contains(dealData.bidderName).click();
-      cy.get('[data-qa="deal-form--select-advertiser"]').click().clear();
-      cy.contains(dealData.advertiser).click();
+      cy.get('[data-qa="deal-form--select-bidder"]').clear().type(deal.bidderName);
+      cy.get('[data-qa="deal-form--select-bidder"]').parent('.input-wrapper--typeahead').find('.dropdown-menu')
+        .children('li')
+        .first()
+        .children('a')
+        .click();
 
+      cy.get('[data-qa="deal-form--select-advertiser"]').clear().type(deal.advertiser);
+      cy.get('[class="active"]').should('be.visible').click(); // Clicking on 1st result for Advertiser
       // Commenting below to verify this will not be need at all
       // cy.get('[data-qa="deal-create--ignore-pub-floor"]').click().then(() => {
       //   cy.get('[data-qa="deal-create--ignore-pub-floor"]').should('have.class', 'is-on');
       //   cy.get('[data-qa="deal-create--ignore-pub-floor"]').click();
       // });
 
-      cy.get('[data-qa="deal-add-edit--submit"]').click();
-      cy.get('[data-qa="modal--confirm"]', { timeout: 6000 }).click();
-    });
+      cy.get('[data-qa="deal-add-edit--submit"]').should('be.visible').click();
+      cy.get('[data-qa="modal--confirm"]').click().wait('@dealCreation');
 
-    it('verifying deal elements', () => {
-      cy.get('[data-qa="deal-detail--title"]').should('contain', dealName);
-      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', dealData.rate);
-      cy.get('[data-qa="deal-detail--deal_discount"]').should('contain', dealData.discount);
-      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', dealData.targetSpend);
-      cy.get('[data-qa="deal-detail--deal_bidder"]').should('contain', dealData.bidderName);
-      cy.get('aside div:nth-child(11) p4').should('contain', dealData.executionName);
-      cy.get('[data-qa="deal-detail--deal_advertiser"]').should('contain', dealData.advertiser);
-      cy.get('[data-qa="deal-detail--deal_priority"]').should('contain', dealData.priority);
+      cy.get('[data-qa="deal-detail--title"]').should('contain', deal.name);
       cy.location().then((currentLocation) => {
         const urlPathName = currentLocation.pathname;
-        dealID = urlPathName.split('/').pop(); // Grabbing Deal ID from URL
-        cy.log(dealID);
+        deal.id = urlPathName.split('/').pop(); // Grabbing Deal ID from URL
       });
     });
 
-    it('Edit Deal', () => {
-      cy.visit(`/deal-dashboard/deals/${dealID}`);
-      dealData.formatType = 'Anchor';
-      dealData.discount = generateRandomNum(10);
-      dealData.rate = generateRandomNum(200);
-      dealData.targetSpend = generateRandomNum(200);
-      dealData.executionName = 'Standard';
+    it('Verifying Created Preferred-Fixed-Rate Deal elements on Detail Page - left section', () => {
+      cy.visit(`/deal-dashboard/deals/${deal.id}`);
+      cy.get('[data-qa="deal-detail--title"]').should('contain', deal.name).should('be.visible'); // 'be.visible needed so cypress does not see it as hidden during run // 'be.visible' needed so cypress does not see it as hidden during run
+      cy.get('div:nth-child(11) > p4').should('contain', deal.executionName);
+      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', deal.rate);
+      cy.get('[data-qa="deal-detail--deal_format"]').should('contain', deal.formatName);
+      cy.get('[data-qa="deal-detail--deal_bidder"]').should('contain', deal.bidderName);
+      cy.get('[data-qa="deal-detail--deal_discount"]').should('contain', deal.discount);
+      cy.get('[data-qa="deal-detail--deal_priority"]').should('contain', deal.priority);
+      cy.get('[data-qa="deal-detail--deal_advertiser"]').should('contain', deal.advertiser);
+      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', Intl.NumberFormat().format(deal.targetSpend));
+    });
 
-      cy.get('[class="button button--edit"]').click({ force: true }).then(() => { // Requires 'force: true' for hidden element
-        cy.url().should('include', 'deal-dashboard/deals/edit/');
-      });
+    it('Edit Preferred-Fixed-Rate Deal', () => {
+      deal.name += '-edited';
+      deal.formatName = 'Anchor';
+      deal.rate = generateRandomNum(200);
+      deal.discount = generateRandomNum(10);
+      deal.executionName = 'Slide to Reveal';
+      deal.targetSpend = generateRandomNum(200);
 
-      // Edit deal name
-      cy.get('[data-qa="deal-create--name"]').focus().type('_edited');
+      cy.visit(`/deal-dashboard/deals/${deal.id}`);
+      cy.get('[class="button button--edit"]').click({ force: true }); // Requires 'force: true' for hidden element
+      cy.url().should('include', 'deal-dashboard/deals/edit/');
 
-      // Edit rate and target spend
-      cy.get('[data-qa="deal-create--rate"]').clear().focus().type(dealData.rate);
-      cy.get('[data-qa="deal-create--rate-discount"]').clear().focus().type(dealData.discount);
-      cy.get('[data-qa="deal-create--target-spend"]').clear().focus().type(dealData.targetSpend);
+      // Edit Deal Name
+      cy.get('[data-qa="deal-create--name"]').focus().clear().type(deal.name);
 
-      // Select a format
-      cy.get('[data-qa="deal-form--select-format"]').click().clear();
-      cy.contains(dealData.formatType).click();
+      // Edit Rate, Target Spend, & Discount
+      cy.get('[data-qa="deal-create--rate"]').clear().focus().type(deal.rate);
+      cy.get('[data-qa="deal-create--rate-discount"]').focus().clear().type(deal.discount); // clear() needed since field initially has a '0'
+      cy.get('[data-qa="deal-create--target-spend"]').clear().focus().type(deal.targetSpend);
+
+      // Select a Format
+      cy.get('[data-qa="deal-form--select-format"]').clear().type(deal.formatName);
+      cy.get('[data-qa="deal-form--select-format"]').parent('.input-wrapper--typeahead').find('.dropdown-menu').children('li')
+        .first()
+        .children('a')
+        .click();
 
       // Select a execution
-      cy.get('[data-qa="deal-form--select-execution"]').click().type(dealData.executionName);
-      cy.contains(dealData.executionName).click();
+      cy.get('[data-qa="deal-form--select-execution"]').click().type(deal.executionName);
+      cy.get('[data-qa="deal-form--select-execution"]').parent('.input-wrapper--typeahead').find('.dropdown-menu').children('li')
+        .first()
+        .children('a')
+        .click();
 
       // Submitting Deal Group info and Validating
       cy.get('[data-qa="deal-add-edit--submit"]').click();
       cy.get('[data-qa="modal--confirm"]').click();
-      cy.get('[data-qa="deal-detail--deal_rate"]')
-        .invoke('text').then((text) => {
-          rateValue = text.replace(/\D/g, ''); // Using Regex to grab number from string
-        });
+      cy.get('[data-qa="deal-detail--title"]', { timeout: 8000 }).should('contain', deal.name);
     });
 
-    it('verifying deal elements', () => {
-      cy.get('[data-qa="deal-detail--title"]', { timeout: 10000 }).should('contain', `${dealName}_edited`);
-      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', dealData.rate);
-      cy.get('[data-qa="deal-detail--deal_discount"]').should('contain', dealData.discount);
-      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', dealData.targetSpend);
-      cy.get('[data-qa="deal-detail--deal_bidder"]').should('contain', dealData.bidderName);
-      cy.get('aside div:nth-child(11) p4').should('contain', dealData.executionName);
-      cy.get('[data-qa="deal-detail--deal_advertiser"]').should('contain', dealData.advertiser);
-      cy.get('[data-qa="deal-detail--deal_priority"]').should('contain', dealData.priority);
+    it('Verifying Edited Preferred-Fixed-Rate Deal elements on Detail Page - left section', () => {
+      cy.visit(`/deal-dashboard/deals/${deal.id}`);
+      cy.get('[data-qa="deal-detail--title"]').should('contain', deal.name).should('be.visible'); // 'be.visible needed so cypress does not see it as hidden during run
+      cy.get('div:nth-child(11) > p4').should('contain', deal.executionName);
+      cy.get('[data-qa="deal-detail--deal_rate"]').should('contain', deal.rate);
+      cy.get('[data-qa="deal-detail--deal_format"]').should('contain', deal.formatName);
+      cy.get('[data-qa="deal-detail--deal_bidder"]').should('contain', deal.bidderName);
+      cy.get('[data-qa="deal-detail--deal_discount"]').should('contain', deal.discount);
+      cy.get('[data-qa="deal-detail--deal_priority"]').should('contain', deal.priority);
+      cy.get('[data-qa="deal-detail--deal_advertiser"]').should('contain', deal.advertiser);
+      cy.get('[data-qa="deal-detail--deal_target_spend"]').should('contain', Intl.NumberFormat().format(deal.targetSpend));
     });
 
-    it('Adding Targeting to the deal and Pushing to Ad Server', () => {
-      cy.visit(`/deal-dashboard/deals/${dealID}`);
+    it('Adding Targeting to the Preferred-Fixed-Rate Deal and Pushing to Ad Server', () => {
+      deal.masValue = 'YD';
+      deal.priorityKraken = 6; // Default Kraken Priority that is pushed. User can't change from UI
+      deal.osValue = 'Nintendo';
+      deal.kruxValue = 'qa-krux';
+      deal.browserValue = 'Firefox';
+      deal.carrierValue = 'T-Mobile';
+      deal.socialValue = 'Pinterest';
+      deal.grapeShotValue = 'apac-airnz';
+      deal.ispValue = 'digital ocean inc.';
+      deal.deviceValue = ['phone', 'Tablet'];
+      deal.locationValue = { name: 'Tokyo', id: 9492 };
+      deal.viewabilitySampling = Math.floor(Math.random() * 99) + 1;
+      deal.viewabilityThreshold = generateRandomNum(100);
+      deal.citadelValue = 'f55ffa62-e24e-411c-be8b-ab5f0da12ea0';
+      deal.frequencyCapHour = generateRandomNumBetween(1, 7); // Show any # from 1-7 times an hour
+      deal.frequencyCapDay = generateRandomNumBetween(8, 21); // Show any # from 8-21 times a day
+      deal.frequencyCapWeek = generateRandomNumBetween(22, 80); // Show # from 22-80 times a week
+      // Above FrequencyCap variables follow the formula of: 'Math.random() * (max - min) + min;'
+
+      cy.server();
+      cy.route('PATCH', '/api/v1/deal/*').as('dmUpdate');
+      cy.route('/api/v1/deal/*/push-status').as('pushStatus');
+      cy.route('/api/v1/citadel/segments').as('citadelUpdate');
+      cy.route('POST', '/api/v1/deal/*/sync').as('adServerPush');
+      cy.route('/api/v1/km-proxy/isp-targeting-list').as('ispTargetingUpdate');
+      cy.route('/api/v1/km-proxy/technology-targeting-integrations').as('techTargetingUpdate');
+      cy.route('/api/v1/km-proxy/grapeshot-categories?limit=2000').as('grapeShotUpdate');
+
+      cy.visit(`/deal-dashboard/deals/${deal.id}`);
       cy.get('[data-qa="targeting--edit_targeting"]').click();
 
       // OPTIMIZATION SETTINGS
       cy.get('[data-qa="toggle-tabs--select-viewability-On"]').click();
-      cy.get('[data-qa="optimization-settings--viewability-threshold"]').click().type('10');
-      cy.get('[data-qa="optimization-settings--sample-rate"]').focus().clear().type('84');
+      cy.get('[data-qa="optimization-settings--sample-rate"]').focus().clear().type(deal.viewabilitySampling);
+      cy.get('[data-qa="optimization-settings--viewability-threshold"]').clear().click().type(deal.viewabilityThreshold);
       cy.get('[data-qa="toggle-tabs--select-frequency-cap-On"]').click();
-      cy.get('[data-qa="optimization-settings--frequency-cap-week"]').focus().type('10');
-      cy.get('[data-qa="optimization-settings--frequency-cap-day"]').focus().type('20');
-      cy.get('[data-qa="optimization-settings--frequency-cap-hour"]').focus().type('30');
+      cy.get('[data-qa="optimization-settings--frequency-cap-week"]').focus().type(deal.frequencyCapWeek);
+      cy.get('[data-qa="optimization-settings--frequency-cap-day"]').focus().type(deal.frequencyCapDay);
+      cy.get('[data-qa="optimization-settings--frequency-cap-hour"]').focus().type(deal.frequencyCapHour);
 
       // SITE LIST TARGETING
       cy.get('[data-qa="targeting--site-list-targeting--switch"]').click();
@@ -174,123 +220,138 @@ context('Deals', () => {
 
       // CUSTOM TARGETING
       cy.get('[data-qa="targeting--custom-targeting--switch"]').click();
-      cy.get('[data-qa="contextual-targeting--include_grapeshot_input"]').click().type('apac-airnz{enter}');
+      cy.get('[data-qa="contextual-targeting--include_grapeshot_input"]').click().type(`${deal.grapeShotValue}{enter}`);
       cy.get('[data-qa="contextual-targeting--key_exclude_dropdown"]').click();
       cy.get('[data-qa="contextual-targeting--exclude_Citadel"]').click();
-      cy.get('[data-qa="contextual-targeting--exclude_citadel_input"]').click().type('f55ffa62{enter}');
-      cy.get('[data-qa="audience-targeting--include_krux_input"]').click().type('qa-krux{enter}');
+      cy.get('[data-qa="contextual-targeting--exclude_citadel_input"]').click().type(`${deal.citadelValue}{enter}`);
+      cy.get('[data-qa="audience-targeting--include_krux_input"]').click().type(`${deal.kruxValue}{enter}`);
       cy.get('[data-qa="audience-targeting--key_exclude_dropdown"]').click();
       cy.get('[data-qa="audience-targeting--exclude_MAS"]').click();
-      cy.get('[data-qa="audience-targeting--exclude_mas_input"]').click().type('A{enter}');
+      cy.get('[data-qa="audience-targeting--exclude_mas_input"]').click().type(`${deal.masValue}{enter}`);
 
       // TECHNOGRAPHIC TARGETING
-      cy.get('[placeholder="+ Add Browser"]').click().type('firefox{enter}');
-      cy.get('[placeholder="+ Add Operating System"]').click().type('nintendo{enter}');
-      cy.get('[placeholder="+ Add ISP Target"]').click().type('digital{enter}');
-      cy.get('[placeholder="+ Add Carrier"]').click().type('at&t{enter}');
-      cy.get('[placeholder="+ Add Social"]').click().type('pin{enter}');
-      cy.get('[placeholder="+ Add Device"]').click();
-      cy.contains('Tablet', { timeout: 9000 }).click();
+      cy.get('[placeholder="+ Add Browser"]').click().type(`${deal.browserValue}{enter}`);
+      cy.get('[placeholder="+ Add Operating System"]').click().type(`${deal.osValue}{enter}`);
+      cy.get('[placeholder="+ Add ISP Target"]').click().type(`${deal.ispValue}{enter}`);
+      cy.get('[placeholder="+ Add Carrier"]').click().type(`${deal.carrierValue}{enter}`);
+      cy.get('[placeholder="+ Add Social"]').click().type(`${deal.socialValue}{enter}`);
+      cy.get('[placeholder="+ Add Device"]').click().type(`${deal.deviceValue[1]}{enter}`);
+      // cy.contains(deal.deviceValue[1], { timeout: 8000 }).click();
 
       // GEO TARGETING
       cy.get('[data-qa="geo-targeting--dropdown_type"]').click();
       cy.get('[data-qa="geo-targeting--dropdown_type_EXCLUDE"]').click();
-      cy.get('[placeholder="Choose a location"]').focus().type('tokyo');
-      cy.contains('Region').click(); // selecting Region version option from dropdown
-      cy.get('[data-qa="targeting--save_targeting"]').click().wait(2400);
+      cy.get('[placeholder="Choose a location"]').focus().type(deal.locationValue.name);
+      cy.contains('Region').click(); // selecting Region version option from dropdown in UI
+      cy.get('[data-qa="targeting--save_targeting"]').click().wait(['@dmUpdate', '@ispTargetingUpdate', '@techTargetingUpdate', '@grapeShotUpdate', '@citadelUpdate']);
 
-      cy.get('[data-qa="deal-details--push_to_ad_server"]').click();
-      cy.wait(2000); // Adding this way to make sure data is pushed fully to external systems.
+      cy.get('[data-qa="deal-details--push_to_ad_server"]').click().wait('@adServerPush'); // Adding this way to make sure data is pushed fully to external systems.
 
-      cy.get('p2:nth-child(2)').should('have', 'Tablet'); // Verifying Deal has tablet in devices section
-
-      // Grabbing targeting values from saved state of deal targeting section
-      cy.get('contextual-targeting section:nth-child(1) p2')
-        .invoke('text').then((text) => {
-          gsValue = text;
-        });
-      cy.get('contextual-targeting section:nth-child(2) p2')
-        .invoke('text').then((text) => {
-          citadelValue = text;
-        });
-      // Temp disable since MAS is not working
-      // cy.get('audience-targeting div.layout--targeting-section section:nth-child(2) p2')
-      //   .invoke('text').then((text) => {
-      //     masValue = text;
-      //   });
+      /* This request is executed 3 times during this test and waits
+       * are needed for external (SSP & Kraken) calls not to
+       * fail due to GET requests calling them prematurely
+       */
+      cy.wait('@pushStatus')
+        .wait('@pushStatus')
+        .wait('@pushStatus')
+        .should('have.property', 'status', 200);
     });
 
-    it('Verifying Deal Info on SSP service', () => {
+    it('Verifying targeting in UI', () => {
+      cy.get('optimization-settings p:nth-child(3)').should('contain', deal.viewabilityThreshold);
+      cy.get('optimization-settings p:nth-child(4)').should('contain', deal.viewabilitySampling);
+      cy.get('optimization-settings div:nth-child(1) > p:nth-child(1) > strong').should('contain', deal.frequencyCapWeek);
+      cy.get('optimization-settings div:nth-child(2) > p:nth-child(1) > strong').should('contain', deal.frequencyCapDay);
+      cy.get('optimization-settings div:nth-child(3) > p:nth-child(1) > strong').should('contain', deal.frequencyCapHour);
+      cy.get('contextual-targeting section:nth-child(1) p2').should('contain', deal.grapeShotValue);
+      cy.get('contextual-targeting section:nth-child(2) p2').should('contain', deal.citadelValue);
+      cy.get('audience-targeting  section:nth-child(1) p2').should('contain', deal.kruxValue);
+      cy.get('audience-targeting  section:nth-child(2) p2').should('contain', deal.masValue);
+      cy.get('geo-targeting div.target.target--subtarget').should('contain', deal.locationValue.name);
+      cy.get('technographic-targeting  div div:nth-child(1) p2').should('contain', deal.browserValue);
+      cy.get('technographic-targeting form div div:nth-child(2) div p2').should('contain', deal.osValue);
+      cy.get('technographic-targeting form div div:nth-child(3) div p2').should('contain', deal.ispValue);
+      cy.get('technographic-targeting form div div:nth-child(4) div p2').should('contain', deal.carrierValue);
+      cy.get('technographic-targeting form div div:nth-child(5) div p2').should('contain', deal.socialValue);
+      cy.get('technographic-targeting form div div:nth-child(6) div p2').should('contain', deal.deviceValue[1]);
+
+      cy.get('[data-qa="deal-detail--deal_type"]').invoke('text').then((text) => {
+        dealType = text; // Grabbing external deal id
+      });
+
+      cy.get('deal-details aside div h4').invoke('text').then((text) => {
+        externalDealId = text; // Grabbing external deal id
+      });
+    });
+
+    it('Verifying PFR Deal Info on SSP service', () => {
       const requestOptions = getRequest();
-      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${dealID}/ssp`;
+      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${deal.id}/ssp`;
 
-      cy.request(requestOptions)
-        .then((resp) => {
-          assert.equal(resp.body.status, 1, 'response status ');
-          cy.log(dealID);
-          assert.equal(resp.body.name, `${dealName}_edited`, 'deal Name ');
-          assert.equal(resp.body.external_id, dealID, 'deal ID ');
-          assert.equal(resp.body.type, 'preferred_fixed_price', 'Deal Type ');
-          assert.equal(resp.body.bidder.name, dealData.bidderName, 'Bidder name ');
-          assert.equal(resp.body.ad_formats[0].name, dealData.formatType, 'adFormat name ');
-          assert.equal(resp.body.ad_formats[0].type, 'banner', 'adFormat type ');
-          assert.equal(resp.body.priority, 'highest', 'priority ');
-        });
+      cy.request(requestOptions).then((resp) => {
+        assert.equal(resp.body.status, 1, 'Response Status ');
+        assert.equal(resp.body.name, deal.name, 'Deal Name ');
+        assert.equal(resp.body.external_id, deal.id, 'Deal ID ');
+        assert.equal(resp.body.type, 'preferred_fixed_price', 'Deal Type ');
+        assert.equal(resp.body.bidder.name, deal.bidderName, 'Bidder name ');
+        assert.equal(resp.body.ad_formats[0].name, deal.formatName, 'Ad-Format name ');
+        assert.equal(resp.body.ad_formats[0].type, 'banner', 'Ad-Format type ');
+        assert.equal(resp.body.priority, deal.priority.toLowerCase(), 'Priority ');
+      });
     });
 
-    // MAS is temporarily not working so commented out MAS assertion
-    it('Verifying Deal Info on Kraken service', () => {
+    it('Verifying PFR Deal Info on Kraken service', () => {
       const requestOptions = getRequest();
-      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${dealID}/kraken`;
+      requestOptions.url = `https://deal-manager.dev.kargo.com/api/v1/deal/${deal.id}/kraken`;
 
-      cy.request(requestOptions)
-        .then((resp) => {
-          const krakenResponse = resp.body;
+      cy.request(requestOptions).then((resp) => {
+        const krakenResponse = resp.body;
 
-          assert.equal(resp.status, 200, 'response status ');
-          assert.equal(krakenResponse.active, true, 'active ');
-          assert.equal(krakenResponse.adFormat, 3, 'adFormat type ');
-          assert.equal(krakenResponse.CPM, rateValue, 'CPM Value');
-          assert.equal(krakenResponse.priority, 6, 'Priority');
-          assert.equal(krakenResponse.viewabilitySampling, 0.84, 'veiwability sampling ');
-          assert.equal(krakenResponse.frequencyCap.day, 20, 'day ');
-          assert.equal(krakenResponse.frequencyCap.hour, 30, 'hour');
-          assert.equal(krakenResponse.frequencyCap.week, 10, 'week');
-          assert.equal(krakenResponse.targeting.editorialGraph, false, 'editorialGraph '); // will change to true
-          assert.equal(krakenResponse.targeting.deviceType.include.includes('phone'), true, 'Device type contains phone');
-          assert.equal(krakenResponse.targeting.country.include[0], 840, 'country ');
-          assert.equal(krakenResponse.targeting.region.exclude[0], '9492', 'region ');
-          assert.equal(krakenResponse.targeting.carrier.include[0], 'att inc.', 'carrier ');
-          assert.equal(krakenResponse.targeting.os.include[0], 'nintendo', 'os ');
-          assert.equal(krakenResponse.targeting.browser.include[0], 'firefox', 'browser ');
-          assert.equal(krakenResponse.targeting.socialBrowser.include[0], 'pinterest', 'socialBrowser include value ');
-          assert.equal(krakenResponse.targeting.isp.include[0], 'digital ocean inc.', 'isp include value ');
-          expect(krakenResponse.targeting.deviceType.include).to.include('tablet'); // verifying device-type
+        assert.equal(resp.status, 200, 'Response Status ');
+        assert.equal(krakenResponse.active, true, 'Active ');
+        assert.equal(krakenResponse.adFormat, 3, 'adFormat type ');
+        assert.equal(krakenResponse.CPM, deal.rate * 100, 'CPM Value '); // Adding '* 100' due to no decimal in Kraken
+        assert.equal(krakenResponse.priority, deal.priorityKraken, 'Priority in Kraken ');
+        assert.equal(krakenResponse.viewabilitySampling, deal.viewabilitySampling / 100, 'veiwability sampling ');
+        assert.equal(krakenResponse.viewabilityThreshold, deal.viewabilityThreshold / 100, 'veiwability sampling :');
+        assert.equal(krakenResponse.frequencyCap.day, deal.frequencyCapDay, 'Day ');
+        assert.equal(krakenResponse.frequencyCap.hour, deal.frequencyCapHour, 'Hour ');
+        assert.equal(krakenResponse.frequencyCap.week, deal.frequencyCapWeek, 'Week ');
+        assert.equal(krakenResponse.targeting.editorialGraph, false, 'editorialGraph '); // will change to true
+        assert.equal(krakenResponse.targeting.deviceType.include.includes(deal.deviceValue[0]), true, 'Device type contains phone ');
+        assert.equal(krakenResponse.targeting.country.include[0], 840, 'country ');
+        assert.equal(krakenResponse.targeting.region.exclude[0], deal.locationValue.id, 'Region ');
+        assert.equal(krakenResponse.targeting.carrier.include[0], deal.carrierValue.toLowerCase(), 'Carrier ');
+        assert.equal(krakenResponse.targeting.os.include[0], deal.osValue.toLowerCase(), 'OS ');
+        assert.equal(krakenResponse.targeting.browser.include[0], deal.browserValue.toLowerCase(), 'Browser ');
+        assert.equal(krakenResponse.targeting.socialBrowser.include[0], deal.socialValue.toLowerCase(), 'Social Browser include value ');
+        assert.equal(krakenResponse.targeting.isp.include[0], deal.ispValue, 'ISP include value ');
+        // Following line is verifying device-type: Tablet
+        // eslint-disable-next-line max-len
+        expect(krakenResponse.targeting.deviceType.include).to.include(deal.deviceValue[1].toLowerCase());
 
-          // Custom Targeting
-          assert.equal(krakenResponse.targeting.custom.logicalOperator, 'AND', 'Logical Operator');
-          assert.equal(krakenResponse.targeting.custom.children[0].logicalOperator, 'AND', 'operator between Contextual Targeting fields ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[0].operator, 'IS', 'Vendor operator (include) ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[0].keyName, 'GS_CHANNELS_ALL', 'Vendor type (Grapeshot) ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[0].valueNames, gsValue, 'Value name (Grapeshot) ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[1].operator, 'IS_NOT', 'Vendor operator (exclude) ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[1].keyName, 'citadel', 'Vendor type (citadel) ');
-          assert.equal(krakenResponse.targeting.custom.children[0].children[1].valueNames[0], citadelValue, 'Value name (citadel) ');
-          assert.equal(krakenResponse.targeting.custom.children[1].logicalOperator, 'OR', 'operator between Audience Targeting sets  ');
-          assert.equal(krakenResponse.targeting.custom.children[1].children[0].logicalOperator, 'AND', 'operator between Contextual Targeting fields ');
-          assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[0].operator, 'IS', 'Vendor operator (include) ');
-          assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[0].keyName, 'ksg', 'Vendor type (krux) ');
-          assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[0].valueNames, 'qa-krux', 'Value name (krux) ');
-          // eslint-disable-next-line max-len
-          // assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[1].operator, 'IS_NOT', 'Vendor operator (exclude) ');
-          // eslint-disable-next-line max-len
-          // assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[1].keyName, 'mas', 'Vendor type (mas) ');
-          // eslint-disable-next-line max-len
-          // assert.equal(krakenResponse.targeting.custom.children[1].children[0].children[1].valueNames, masValue, 'Value name (mas) ');
-        });
+        // Custom Targeting
+        const krakenRespTargetingCustom = krakenResponse.targeting.custom;
+        assert.equal(krakenRespTargetingCustom.logicalOperator, 'AND', 'Logical Operator');
+        assert.equal(krakenRespTargetingCustom.children[0].logicalOperator, 'AND', 'operator between Contextual Targeting fields ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[0].operator, 'IS', 'Vendor operator (include) ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[0].keyName, 'GS_CHANNELS_ALL', 'Vendor type (Grapeshot) ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[0].valueNames, deal.grapeShotValue, 'Value name (Grapeshot) ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[1].operator, 'IS_NOT', 'Vendor operator (exclude) ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[1].keyName, 'citadel', 'Vendor type (citadel) ');
+        assert.equal(krakenRespTargetingCustom.children[0].children[1].valueNames[0], deal.citadelValue, 'Value name (citadel) ');
+        assert.equal(krakenRespTargetingCustom.children[1].logicalOperator, 'OR', 'operator between Audience Targeting sets  ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].logicalOperator, 'AND', 'operator between Contextual Targeting fields ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[0].operator, 'IS', 'Vendor operator (include) ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[0].keyName, 'ksg', 'Vendor type (krux) ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[0].valueNames, deal.kruxValue, 'Value name (krux) ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[1].operator, 'IS_NOT', 'Vendor operator (exclude) ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[1].keyName, 'mas', 'Vendor type (mas) ');
+        assert.equal(krakenRespTargetingCustom.children[1].children[0].children[1].valueNames, deal.masValue, 'Value name (mas) ');
+      });
     });
 
-    it('Clicking on "Archive" button in the deal entry page', () => {
+    it('Archiving Preferred-Fixed-Rate Deal from Detail page', () => {
       cy.server();
       cy.route('/api/v1/citadel/segments').as('citadelApi');
       cy.route('/api/v1/users/session-user').as('sessionUserApi');
@@ -299,43 +360,48 @@ context('Deals', () => {
       cy.route('/api/v1/km-proxy/technology-targeting-integrations').as('techTargetApi');
       cy.route('/api/v1/km-proxy/service-proxy?limit=999&page=1&requested_endpoint=api/v1/segments&requested_service=cma-mgmt&sort_direction=ASC&type=0,2,3').as('cmaApi');
 
-      cy.visit(`deal-dashboard/deals/${dealID}`)
-        .wait('@sessionUserApi')
-        .wait('@grapeshotApi')
-        .wait('@cmaApi')
-        .wait('@citadelApi')
-        .wait('@ispApi')
-        .wait('@techTargetApi');
+      cy.visit(`deal-dashboard/deals/${deal.id}`).wait(['@sessionUserApi', '@grapeshotApi', '@cmaApi', '@citadelApi', '@ispApi', '@techTargetApi']);
       cy.get('[data-qa="deal-detail--deal_archive"]').click();
       cy.get('[data-qa="modal--confirm"]').last().click();
     });
 
-    it('Verifying that deal is archived', () => {
+    it('Verifying Preferred-Fixed-Rate Deal is archived', () => {
+      cy.server();
+      cy.route('/api/v1/deal?page=1&limit=25&search=*').as('seachAPI');
+
       cy.get('[data-qa="targeting--edit_targeting"]', { timeout: 8000 }).should('be.disabled');
       cy.get('.icon-archive').should('exist');
       cy.get('[data-qa="deal-detail--deal_unarchive"]').should('contain', 'Unarchive');
       cy.get('[data-qa="deal-create--goto-deal-group"] .breadcrumb').click(); // User return to deal groups entry page
-      cy.get('[type="search"]', { timeout: 8000 }).clear().type(dealName);
+      cy.get('[type="search"]', { timeout: 8000 }).clear().type(deal.name).wait('@seachAPI');
       cy.get('.t-regular').should('exist'); // No deal is returned
       cy.get('.u-grid-gap-24 > div:nth-child(4)').click(); // Clicking no "archive" filter
       cy.get('li:nth-child(3) a').click(); // Clicking on archive option
-      cy.get('[data-qa="deal-dashboard--select-deal"]', { timeout: 7000 }).should('exist');
+      cy.get('[data-qa="deal-dashboard--select-deal"]', { timeout: 8000 }).should('exist');
       cy.get('.t-regular').should('not.exist'); // "No results found" text should NOT display
     });
 
-    it('Clicking on "Unarchive" button in the deal entry page', () => {
+    it('Unarchiving Preferred-Fixed-Rate Deal from Detail page', () => {
       cy.get('[data-qa="deal-dashboard--select-deal"]').click();
       cy.get('[data-qa="deal-detail--deal_unarchive"]').click();
       cy.get('[data-qa="modal--confirm"]').last().click();
     });
 
-    it('Verifying that deal is Unarchived', () => {
+    it('Verifying Preferred-Fixed-Rate Deal is Unarchived', () => {
       cy.get('[data-qa="targeting--edit_targeting"]', { timeout: 8000 }).should('be.enabled');
       cy.get('.icon-archive').should('not.exist');
       cy.get('[data-qa="deal-detail--deal_archive"]').should('contain', 'Archive');
       cy.get('[data-qa="deal-create--goto-deal-group"] .breadcrumb').click(); // User return to deal groups landing page
-      cy.get('[type="search"]').clear().type(dealName);
+      cy.get('[type="search"]').clear().type(deal.name);
       cy.get('.t-regular').should('not.exist'); // "No results found" text should NOT display
+    });
+
+    it('Verify deal info from deal-group level', () => {
+      cy.get('deals > section > div.table > data-row:nth-child(2) > h6 > a').should('contain', deal.name);
+      cy.get('deals div.table data-row:nth-child(2) p2:nth-child(4)').should('contain', externalDealId);
+      cy.get('deals div.table data-row:nth-child(2) p2:nth-child(5)').should('contain', dealType);
+      cy.get('deals div.table data-row:nth-child(2) p2:nth-child(6)').should('contain', deal.rate);
+      cy.get('deals data-row:nth-child(2) div.deal-status.u-centerXY.red').should('contain', ' INACTIVE ');
     });
   });
 });
